@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="oaiprovider" default="dist" basedir=".">
+  <loadproperties srcFile="build.properties"/>
+  <path id="base.path">
+    <pathelement location="${lib.jrdf}"/>
+    <pathelement location="${lib.httpclient}"/>
+    <pathelement location="${lib.logging}"/>
+    <pathelement location="${lib.log4j}"/>
+    <pathelement location="${lib.xerces}"/>
+    <pathelement location="${lib.xml-apis}"/>
+    <pathelement location="${lib.axis}"/>
+    <pathelement location="${lib.discovery}"/>
+    <pathelement location="${lib.dbcp}"/>
+    <pathelement location="${lib.collections}"/>
+    <pathelement location="${lib.pool}"/>
+    <pathelement location="${lib.fedoraclient}"/>
+    <pathelement location="${lib.saaj}"/>
+    <pathelement location="${lib.jaxrpc}"/>
+    <pathelement location="${lib.proai}"/>
+  </path>
+  <path id="compile.path">
+    <path refid="base.path"/>
+    <pathelement location="${lib.junit}"/>
+  </path>
+  <path id="test.path">
+    <path refid="compile.path"/>
+    <pathelement location="build/classes"/>
+  </path>
+  <target name="classes" 
+          depends="prep"
+          description="build all java classes into build/">
+    <mkdir dir="build/classes"/>
+    <javac srcdir="src/java" destdir="build/classes" 
+           includes="**" 
+           classpathref="compile.path"
+           optimize="${optimize}" debug="${debug}"/>
+    <copy todir="build/classes">
+      <fileset dir="src/config"/>
+    </copy>
+  </target>
+  <target name="dist" 
+          depends="classes" 
+          description="Build the distribution in dist/">
+    <copy todir="build/webapp">
+      <fileset dir="src/webapp"/>
+    </copy>
+    <mkdir dir="build/webapp/WEB-INF/classes"/>
+    <copy todir="build/webapp/WEB-INF/classes">
+      <fileset dir="build/classes"/>
+    </copy>
+    <mkdir dir="build/webapp/WEB-INF/lib"/>
+    <copy todir="build/webapp/WEB-INF/lib">
+      <fileset dir="lib">
+        <exclude name="junit.jar"/>
+      </fileset>
+    </copy>
+    <jar jarfile="dist/oaiprovider.war" basedir="build/webapp"/>
+  </target>
+  <target name="doc"
+          depends="prep"
+	      description="Build the documentation in dist/doc/api">
+    <javadoc packagenames="fedora.services.oaiprovider.*"
+           classpathref="compile.path"
+           sourcepath="src/java"
+           defaultexcludes="yes"
+           destdir="dist/doc/api"
+           windowtitle="Fedora OAI Provider Javadocs">
+      <doctitle><![CDATA[<h1>Fedora OAI Provider Javadocs Javadocs</h1>]]></doctitle>
+    </javadoc>
+  </target>
+  <target name="test" description="Run tests" depends="classes">
+    <!-- 
+      For this task to run, prior to running ant, set CLASSPATH=lib\junit.jar
+    -->
+    <junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="yes" showoutput="true">
+      <formatter type="plain" usefile="false"/> 
+      <classpath refid="test.path"/>
+      <test name="fedora.services.oaiprovider.test.FedoraOAIDriverTest"/>
+    </junit>
+  </target>
+  <target name="prep"
+          description="prepare for a build">
+    <mkdir dir="build"/>
+    <mkdir dir="dist"/>
+  </target>
+  <target name="clean"
+          description="remove all build-generated stuff">
+      <delete dir="build"/>
+      <delete dir="dist"/>
+  </target>
+</project>
