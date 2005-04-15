@@ -45,20 +45,20 @@ public class FedoraOAIDriver implements OAIDriver {
      */
     public void init(Properties props) throws RepositoryException {
         m_properties = props;
-        m_fedoraBaseURL = getProperty("fedora.baseURL"); 
-        m_fedoraUser = getProperty("fedora.user"); 
-        m_fedoraPass = getProperty("fedora.pass"); 
+        m_fedoraBaseURL = getProperty("driver.fedora.baseURL"); 
+        m_fedoraUser = getProperty("driver.fedora.user"); 
+        m_fedoraPass = getProperty("driver.fedora.pass"); 
         try {
-            m_identify = new URL(getProperty("identify"));
+            m_identify = new URL(getProperty("driver.fedora.identify"));
         } catch (MalformedURLException e) {
             throw new RepositoryException("Identify property is not a valid URL: " + m_properties.getProperty("identify"), e);
         }
         m_metadataFormats = getMetadataFormats(props);
-        m_itemID = getProperty("itemID");
-        m_setSpec = getProperty("setSpec");
-        m_setSpecDissType = getProperty("setSpec.dissType");
+        m_itemID = getProperty("driver.fedora.itemID");
+        m_setSpec = getProperty("driver.fedora.setSpec");
+        m_setSpecDissType = getProperty("driver.fedora.setSpec.dissType");
         
-        String className = getProperty("queryHandlerClass");
+        String className = getProperty("driver.fedora.queryHandlerClass");
         try {
             Class queryHandlerClass = Class.forName(className);
             m_queryHandler = (QueryHandler)queryHandlerClass.newInstance();
@@ -120,12 +120,12 @@ public class FedoraOAIDriver implements OAIDriver {
         List list = new ArrayList();
         
         // step through properties, create mf per
-        formats = getProperty("md.formats").split(" ");
+        formats = getProperty("driver.fedora.md.formats").split(" ");
         for (int i = 0; i < formats.length; i++) {
             prefix = formats[i];
-            namespaceURI = getProperty("md.format." + prefix + ".loc");
-            schemaLocation = getProperty("md.format." + prefix + ".uri");
-            dissType = getProperty("md.format." + prefix + ".dissType");
+            namespaceURI = getProperty("driver.fedora.md.format." + prefix + ".loc");
+            schemaLocation = getProperty("driver.fedora.md.format." + prefix + ".uri");
+            dissType = getProperty("driver.fedora.md.format." + prefix + ".dissType");
             list.add(new FedoraMetadataFormat(prefix, 
                                                      namespaceURI, 
                                                      schemaLocation, 
