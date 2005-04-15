@@ -11,6 +11,7 @@ import proai.error.RepositoryException;
  * @author Edwin Shin
  */
 public class ITQLQueryHandler implements QueryHandler {
+    private static final String QUERY_LANGUAGE = "itql";
     private String m_oaiItemID;
     private String m_fedoraHost;
     private String m_fedoraUser;
@@ -23,9 +24,8 @@ public class ITQLQueryHandler implements QueryHandler {
         m_riSearch = "" + 
                      "?type=tuples" +
                      "&lang=iTQL" +
-                     "&format=Simple" +
-                     "&query=QUERY_TEXT_OR_URL" +
-                     "&template=[TEMPLATE_TEXT_OR_URL (if applicable)]";
+                     "&format=Sparql" +
+                     "&query=QUERY_TEXT_OR_URL";
     }
     
     /* (non-Javadoc)
@@ -61,6 +61,10 @@ public class ITQLQueryHandler implements QueryHandler {
         
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    public String getQueryLanguage() {
+        return QUERY_LANGUAGE;
     }
 
 }
