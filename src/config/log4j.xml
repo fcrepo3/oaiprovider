@@ -11,13 +11,15 @@
   <category name="fedora.services.oaiprovider">
     <priority value="INFO" />
   </category>
+  
   <category name="proai">
     <priority value="INFO" />
-<!--
-    <priority value="DEBUG" />
-    <priority value="WARN" />
--->
   </category>
+<!--
+  <category name="proai.cache.ReadWriteLock">
+    <priority value="DEBUG" />
+  </category>
+-->
 
   <root>
     <priority value="WARN" />
