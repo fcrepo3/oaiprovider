@@ -114,6 +114,7 @@ public class FedoraOAIDriver implements OAIDriver {
 
     public Date getLatestDate() throws RepositoryException {
         Map parms = m_queryFactory.latestRecordDateQuery();
+//        TupleIterator tuples = getTuples(parms);
         return null;
     }
 
