@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.jrdf.graph.Literal;
 import org.trippi.*;
 
 import fedora.client.Downloader;
@@ -117,8 +118,22 @@ public class FedoraOAIDriver implements OAIDriver {
 
     public Date getLatestDate() throws RepositoryException {
         Map parms = m_queryFactory.latestRecordDateQuery();
-        TupleIterator tuples = getTuples(parms);
-        return null;
+        TupleIterator tuples = null;
+        try {
+            tuples = getTuples(parms);
+            if (tuples.hasNext()) {
+                String dateString = ((Literal) tuples.next().get("date")).toString();
+                System.out.println(dateString);
+                return null;
+            } else {
+                // no tuples... what to do?
+                return null;
+            }
+        } catch (Exception e) {
+            throw new RepositoryException("Error querying for latest changed record date", e);
+        } finally {
+            if (tuples != null) try { tuples.close(); } catch (Exception e) { }
+        }
     }
 
     public RemoteIterator listMetadataFormats() throws RepositoryException {
@@ -152,7 +167,9 @@ public class FedoraOAIDriver implements OAIDriver {
         try {
             tempFile = File.createTempFile("proai-fedora-queryresult", ".xml");
             tempFile.deleteOnExit();
-            m_downloader.get(getQueryURL(params), new FileOutputStream(tempFile));
+            String url = getQueryURL(params);
+            System.out.println(url);
+            m_downloader.get(url, new FileOutputStream(tempFile));
             return TupleIterator.fromStream(new FileInputStream(tempFile), RDFFormat.SPARQL);
         } catch (Exception e) {
             if (tempFile != null) tempFile.delete();
@@ -167,8 +184,13 @@ public class FedoraOAIDriver implements OAIDriver {
         url.append(m_fedoraBaseURL);
         url.append("risearch?");
         Iterator iter = params.keySet().iterator();
+        int n = 0;
         while (iter.hasNext()) {
             String name = (String) iter.next();
+            if (n > 0) {
+                url.append("&");
+            }
+            n++;
             url.append(name);
             url.append('=');
             try {

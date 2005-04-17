@@ -4,6 +4,8 @@
   <path id="base.path">
     <pathelement location="${lib.jrdf}"/>
     <pathelement location="${lib.trippi}"/>
+    <pathelement location="${lib.xmlpull}"/>
+    <pathelement location="${lib.xpp}"/>
     <pathelement location="${lib.httpclient}"/>
     <pathelement location="${lib.logging}"/>
     <pathelement location="${lib.log4j}"/>
