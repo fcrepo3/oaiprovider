@@ -31,13 +31,13 @@ public class TestFedoraOAIDriver extends TestCase {
 
     //////////////////////////////////////////////////////////////////////////
 
-    public void testLatestDate() throws Exception {
+    public void atestLatestDate() throws Exception {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String latestDate = df.format(m_impl.getLatestDate());
         System.out.println("Latest Date was " + latestDate);
     }
 
-    public void atestIdentity() throws Exception {
+    public void testIdentity() throws Exception {
         StringWriter writer = new StringWriter();
         m_impl.write(new PrintWriter(writer, true));
         System.out.println("Result of writeIdentity:\n" + writer.toString());

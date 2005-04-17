@@ -1,26 +1,22 @@
 package fedora.services.oaiprovider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import proai.driver.impl.RemoteIteratorImpl;
-import proai.driver.OAIDriver;
-import proai.driver.RemoteIterator;
-import proai.error.RepositoryException;
+import fedora.client.Downloader;
+
+import proai.driver.impl.*;
+import proai.driver.*;
+import proai.error.*;
 
 /**
- * @author Edwin Shin
+ * Implementation of the OAIDriver interface for Fedora.
+ *
+ * @author Edwin Shin, cwilper@cs.cornell.edu
  */
 public class FedoraOAIDriver implements OAIDriver {
+
     private boolean m_initialized;
     private Properties m_properties;
     private QueryHandler m_queryHandler;
@@ -34,10 +30,10 @@ public class FedoraOAIDriver implements OAIDriver {
     private String m_setSpecDissType;
     
     private Collection m_metadataFormats;
+
+    private Downloader m_downloader;
     
     public FedoraOAIDriver() {
-        m_metadataFormats = new ArrayList();
-        
     }
     
     /* (non-Javadoc)
@@ -45,7 +41,7 @@ public class FedoraOAIDriver implements OAIDriver {
      */
     public void init(Properties props) throws RepositoryException {
         m_properties = props;
-        m_fedoraBaseURL = getProperty("driver.fedora.baseURL"); 
+        m_fedoraBaseURL = getProperty("driver.fedora.baseURL");
         m_fedoraUser = getProperty("driver.fedora.user"); 
         m_fedoraPass = getProperty("driver.fedora.pass"); 
         try {
@@ -66,6 +62,16 @@ public class FedoraOAIDriver implements OAIDriver {
             throw new RepositoryException("Unable to get an instance of "
                     + className, e);
         }
+
+        try {
+            URL baseURL = new URL(m_fedoraBaseURL);
+            String host = baseURL.getHost();
+            int port = baseURL.getPort();
+            if (port < 0) port = baseURL.getDefaultPort();
+            m_downloader = new Downloader(host, port, m_fedoraUser, m_fedoraPass);
+        } catch (Exception e) {
+            throw new RepositoryException("Error parsing baseURL", e);
+        }
         
         m_initialized = true;
     }
@@ -74,18 +80,16 @@ public class FedoraOAIDriver implements OAIDriver {
      * @see proai.driver.OAIDriver#write(java.io.PrintWriter)
      */
     public void write(PrintWriter out) throws RepositoryException {
+        File tempFile = null;
         try {
-            BufferedReader reader = new BufferedReader(
-                                        new InputStreamReader(m_identify.openStream()));
-        
-            String line = reader.readLine();
-            while (line != null) {
-                out.println(line);
-                line = reader.readLine();
-            }
-            reader.close();
+            tempFile = File.createTempFile("proai-fedora-identify", ".xml");
+            tempFile.deleteOnExit();
+            m_downloader.get(m_identify.toString(), new FileOutputStream(tempFile));
+            writeStream(new FileInputStream(tempFile), out, m_identify.toString());
         } catch (IOException e) {
-            throw new RepositoryException("Error reading: " + m_identify.toString(), e);
+            throw new RepositoryException("Unable to write temporary identify.xml", e);
+        } finally {
+            if (tempFile != null) tempFile.delete(); 
         }
     }
 
@@ -140,6 +144,22 @@ public class FedoraOAIDriver implements OAIDriver {
             throw new RepositoryException("Required property is not set: " + key);
         } else {
             return val;
+        }
+    }
+
+    private void writeStream(InputStream in, PrintWriter out, String source) throws RepositoryException {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = reader.readLine();
+            while (line != null) {
+                out.println(line);
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            throw new RepositoryException("Error reading " + source, e);
+        } finally {
+            if (reader != null) try { reader.close(); } catch (Exception e) { }
         }
     }
     
