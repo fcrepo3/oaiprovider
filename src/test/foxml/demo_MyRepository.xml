@@ -5,12 +5,10 @@
     <foxml:property NAME="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" VALUE="FedoraObject"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="My Repository"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2005-04-17T12:50:40.703Z"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2005-04-17T12:52:11.296Z"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion CREATED="2005-04-17T12:50:40.703Z" ID="DC1.0" LABEL="Dublin Core Metadata"
-      MIMETYPE="text/xml" SIZE="241">
+    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Metadata"
+      MIMETYPE="text/xml">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
           <dc:title>My Repository</dc:title>
@@ -20,8 +18,8 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X" ID="Identify.xml" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion CREATED="2005-04-17T12:52:11.296Z" ID="Identify.xml.0" LABEL="Enter a label here."
-      MIMETYPE="text/xml" SIZE="374">
+    <foxml:datastreamVersion ID="Identify.xml.0" LABEL="Enter a label here."
+      MIMETYPE="text/xml">
       <foxml:xmlContent>
         <Identify>
           <repositoryName>My Repository</repositoryName>

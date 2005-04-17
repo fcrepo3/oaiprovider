@@ -5,11 +5,9 @@
     <foxml:property NAME="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" VALUE="FedoraObject"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Set of Items Above Two and Odd"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2005-04-17T11:08:31.656Z"/>
-    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2005-04-17T11:13:19.562Z"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion CREATED="2005-04-17T11:13:19.562Z" ID="RELS-EXT.0" LABEL="Rels" MIMETYPE="text/xml" SIZE="323">
+    <foxml:datastreamVersion ID="RELS-EXT.0" LABEL="Rels" MIMETYPE="text/xml">
       <foxml:xmlContent>
         <rdf:RDF xmlns:oai="http://www.openarchives.org/OAI/2.0/"
           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">
@@ -22,8 +20,8 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion CREATED="2005-04-17T11:08:31.656Z" ID="DC1.0" LABEL="Dublin Core Metadata"
-      MIMETYPE="text/xml" SIZE="249">
+    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Metadata"
+      MIMETYPE="text/xml">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
           <dc:description>Set of items whose identifier's numeric part is greater than two and odd</dc:description>
