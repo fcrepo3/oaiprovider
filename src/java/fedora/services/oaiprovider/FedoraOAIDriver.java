@@ -28,6 +28,7 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_IDENTIFY         = NS + "identify";
     public static final String PROP_ITEMID           = NS + "itemID";
     public static final String PROP_SETSPEC          = NS + "setSpec";
+    public static final String PROP_SETSPEC_NAME     = NS + "setSpec.name";
     public static final String PROP_SETSPEC_DISSTYPE = NS + "setSpec.dissType";
     public static final String PROP_QUERY_FACTORY    = NS + "queryFactory";
     public static final String PROP_FORMATS          = NS + "md.formats";
@@ -45,6 +46,7 @@ public class FedoraOAIDriver implements OAIDriver {
     private String m_itemID;
     private String m_itemSetPath;
     private String m_setSpec;
+    private String m_setSpecName;
     private String m_setSpecDissType;
     
     private Collection m_metadataFormats;
@@ -66,6 +68,7 @@ public class FedoraOAIDriver implements OAIDriver {
         m_fedoraPass      = getRequired(props, PROP_PASS); 
         m_itemID          = getRequired(props, PROP_ITEMID);
         m_setSpec         = getRequired(props, PROP_SETSPEC);
+        m_setSpecName     = getRequired(props, PROP_SETSPEC_NAME);
         m_setSpecDissType = getRequired(props, PROP_SETSPEC_DISSTYPE);
 
         m_metadataFormats = getMetadataFormats(props);
