@@ -62,9 +62,9 @@ even for items that are not in any sets
 select $itemID $recordDiss $setSpec
 from <#ri>
 where $obj <http://www.openarchives.org/OAI/2.0/itemID> $itemID
-and $obj <fedora-view:disseminates> $recordDiss
-and $recordDiss <fedora-view:disseminationType> <info:fedora/*/oai_dc>
-and ($recordDiss <fedora-view:disseminationType> <info:fedora/*/oai_dc>
+and $obj <fedora-view:disseminates> $recordDiss 
+and $recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
+and ($recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
   or ($obj <fedora-rels-ext:isMemberOf> $set
     and $set <http://www.openarchives.org/OAI/2.0/setSpec> $setSpec))
 
@@ -78,7 +78,7 @@ select $obj $itemID $lastMod $setSpec
   from <#ri>
  where $obj <http://www.openarchives.org/OAI/2.0/itemID> $itemID
    and $obj <fedora-view:disseminates> $diss
-   and $diss <fedora-view:disseminationType> <info:fedora/*/oai_dc>
+   and $diss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
    and $diss <fedora-view:lastModifiedDate> $lastMod
    and $obj <fedora-rels-ext:isMemberOf> $set
    and $set <http://www.openarchives.org/OAI/2.0/setSpec> $setSpec
@@ -94,14 +94,10 @@ count(select $setSpec
 from <#ri>
 where $obj <http://www.openarchives.org/OAI/2.0/itemID> $itemID
 and $obj <fedora-view:disseminates> $recordDiss
-and $recordDiss <fedora-view:disseminationType> <info:fedora/*/oai_dc>
+and $recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
 and $recordDiss <fedora-view:lastModifiedDate> $lastMod
 having $k0 <http://tucana.org/tucana#occurs>
 '0.0'^^<http://www.w3.org/2001/XMLSchema#double>
-
-/*
-
-
 
 */
 
