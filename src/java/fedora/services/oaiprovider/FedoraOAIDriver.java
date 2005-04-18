@@ -2,9 +2,11 @@ package fedora.services.oaiprovider;
 
 import java.io.*;
 import java.net.*;
+import java.text.*;
 import java.util.*;
 
 import org.jrdf.graph.Literal;
+import org.jrdf.graph.URIReference;
 import org.trippi.*;
 
 import fedora.client.Downloader;
@@ -125,12 +127,14 @@ public class FedoraOAIDriver implements OAIDriver {
         try {
             tuples = getTuples(parms);
             if (tuples.hasNext()) {
-                String dateString = ((Literal) tuples.next().get("date")).toString();
-                System.out.println(dateString);
-                return null;
+                Literal dateLiteral = (Literal) tuples.next().get("date");
+                if (dateLiteral == null) {
+                    throw new RepositoryException("A row was returned, but it did not contain a 'date' binding");
+                }
+                return parseDate(dateLiteral.getLexicalForm());
             } else {
                 // no tuples... what to do?
-                return null;
+                throw new RepositoryException("No rows returned from query");
             }
         } catch (Exception e) {
             throw new RepositoryException("Error querying for latest changed record date", e);
@@ -144,7 +148,31 @@ public class FedoraOAIDriver implements OAIDriver {
     }
 
     public RemoteIterator listSetInfo() throws RepositoryException {
-        // TODO Auto-generated method stub
+        Map parms = m_queryFactory.setInfoQuery();
+        TupleIterator tuples = null;
+        try {
+            tuples = getTuples(parms);
+            while (tuples.hasNext()) {
+                Map tuple = tuples.next();
+                Literal setSpecLiteral = (Literal) tuple.get("setSpec");
+                if (setSpecLiteral == null) throw new RepositoryException("Unexpected: got null setSpec");
+                String setSpec = setSpecLiteral.getLexicalForm();
+                Literal setNameLiteral = (Literal) tuple.get("setName");
+                if (setNameLiteral == null) throw new RepositoryException("Unexpected: got null setName");
+                String setName = setNameLiteral.getLexicalForm();
+                URIReference setDissReference = (URIReference) tuple.get("setDiss");
+                if (setDissReference == null) {
+                    System.out.println(setSpec + " -> " + setName);
+                } else {
+                    String setDiss = setDissReference.getURI().toString();
+                    System.out.println(setSpec + " -> " + setName + " -> " + setDiss);
+                }
+            }
+        } catch (Exception e) {
+            throw new RepositoryException("Error querying for set information", e);
+        } finally {
+            if (tuples != null) try { tuples.close(); } catch (Exception e) { }
+        }
         return null;
     }
 
@@ -255,6 +283,23 @@ public class FedoraOAIDriver implements OAIDriver {
             if (reader != null) try { reader.close(); } catch (Exception e) { }
         }
     }
-    
+
+    private Date parseDate(String dateString) throws RepositoryException {
+        DateFormat formatter = null;
+        if (dateString.length() == 19) {
+            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        } else if (dateString.length() == 20) {
+            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        } else if (dateString.length() == 23) {
+            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        } else if (dateString.length() == 24) {
+            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        }
+        try {
+            return formatter.parse(dateString);
+        } catch (Exception e) {
+            throw new RepositoryException("Could not parse date: " + dateString);
+        }
+    }
 
 }

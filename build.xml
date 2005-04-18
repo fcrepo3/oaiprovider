@@ -97,11 +97,11 @@
       <sysproperty key="driver.fedora.md.formats" value="oai_dc"/>
       <sysproperty key="driver.fedora.md.format.oai_dc.loc" value="http://www.openarchives.org/OAI/2.0/oai_dc.xsd"/>
       <sysproperty key="driver.fedora.md.format.oai_dc.uri" value="http://www.openarchives.org/OAI/2.0/oai_dc/"/>
-      <sysproperty key="driver.fedora.md.format.oai_dc.dissType" value="info:fedora/*/DC"/>
+      <sysproperty key="driver.fedora.md.format.oai_dc.dissType" value="info:fedora/*/oai_dc"/>
       <sysproperty key="driver.fedora.itemID" value="http://www.openarchives.org/OAI/2.0/itemID"/>
       <sysproperty key="driver.fedora.setSpec" value="http://www.openarchives.org/OAI/2.0/setSpec"/>
       <sysproperty key="driver.fedora.setSpec.name" value="http://www.openarchives.org/OAI/2.0/setName"/>
-      <sysproperty key="driver.fedora.setSpec.dissType" value="info:fedora/*/set.xml"/>
+      <sysproperty key="driver.fedora.setSpec.dissType" value="info:fedora/*/SetInfo.xml"/>
       <sysproperty key="driver.fedora.queryFactory" value="fedora.services.oaiprovider.ITQLQueryFactory"/>
       <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/>
     </junit>

@@ -9,4 +9,6 @@ public interface QueryFactory {
 
     public Map latestRecordDateQuery();
 
+    public Map setInfoQuery();
+
 }

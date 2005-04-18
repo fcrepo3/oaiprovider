@@ -43,7 +43,7 @@ public class TestFedoraOAIDriver extends TestCase {
         System.out.println("Result of writeIdentity:\n" + writer.toString());
     }
 
-    public void atestFormats() throws Exception {
+    public void testFormats() throws Exception {
         Iterator iter = m_impl.listMetadataFormats();
         while (iter.hasNext()) {
             MetadataFormat format = (MetadataFormat) iter.next();
@@ -56,7 +56,7 @@ public class TestFedoraOAIDriver extends TestCase {
         }
     }
 
-    public void atestSets() throws Exception {
+    public void testSets() throws Exception {
         Iterator iter = m_impl.listSetInfo();
         while (iter.hasNext()) {
             SetInfo info = (SetInfo) iter.next();
