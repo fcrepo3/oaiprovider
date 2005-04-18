@@ -58,6 +58,8 @@ public class FedoraOAIDriver implements OAIDriver {
     private Collection m_metadataFormats;
 
     private Downloader m_downloader;
+
+    private FedoraClient m_fedora;
     
     public FedoraOAIDriver() {
     }
@@ -102,26 +104,24 @@ public class FedoraOAIDriver implements OAIDriver {
             int p = baseURL.getPort();
             if (p < 0) p = baseURL.getDefaultPort();
             m_downloader = new Downloader(h, p, m_fedoraUser, m_fedoraPass);
+
+            m_fedora = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
+
         } catch (Exception e) {
             throw new RepositoryException("Error parsing baseURL", e);
         }
     }
 
     public void write(PrintWriter out) throws RepositoryException {
-        File tempFile = null;
+        HttpInputStream in = null;
         try {
-            tempFile = File.createTempFile("proai-fedora-identify", ".xml");
-            tempFile.deleteOnExit();
-            m_downloader.get(m_identify.toString(), 
-                             new FileOutputStream(tempFile));
-            writeStream(new FileInputStream(tempFile), 
-                        out, 
-                        m_identify.toString());
+            in = m_fedora.get(m_identify.toString(), true);
+            writeStream(in, out, m_identify.toString());
         } catch (IOException e) {
             throw new RepositoryException("Error getting identify.xml from " 
                     + m_identify.toString(), e);
         } finally {
-            if (tempFile != null) tempFile.delete(); 
+            if (in != null) try { in.close(); } catch (Exception e) { }
         }
     }
 
@@ -129,7 +129,7 @@ public class FedoraOAIDriver implements OAIDriver {
         Map parms = m_queryFactory.latestRecordDateQuery();
         TupleIterator tuples = null;
         try {
-            tuples = getTuples(parms);
+            tuples = m_fedora.getTuples(parms);
             if (tuples.hasNext()) {
                 Literal dateLiteral = (Literal) tuples.next().get("date");
                 if (dateLiteral == null) {
@@ -152,7 +152,13 @@ public class FedoraOAIDriver implements OAIDriver {
     }
 
     public RemoteIterator listSetInfo() throws RepositoryException {
-        return new FedoraSetInfoIterator(getTuples(m_queryFactory.setInfoQuery()));
+        TupleIterator tuples = null;
+        try {
+            tuples = m_fedora.getTuples(m_queryFactory.setInfoQuery());
+        } catch (IOException e) {
+            throw new RepositoryException("Error getting tuples from Fedora", e);
+        }
+        return new FedoraSetInfoIterator(tuples);
     }
 
     public RemoteIterator listRecords(Date from, 
@@ -171,50 +177,6 @@ public class FedoraOAIDriver implements OAIDriver {
     //////////////////////////////////////////////////////////////////////////
     ////////////////////////////// Helper Methods ////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-
-    private TupleIterator getTuples(Map params) throws RepositoryException {
-        if (logger.isInfoEnabled()) {
-            String query = (String) params.get("query");
-            logger.info("Entered getTuples.  Query follows:\n" + query);
-        }
-        File tempFile = null;
-        try {
-            tempFile = File.createTempFile("proai-fedora-queryresult", ".xml");
-            tempFile.deleteOnExit();
-            String url = getQueryURL(params);
-            m_downloader.get(url, new FileOutputStream(tempFile));
-            return TupleIterator.fromStream(new FileInputStream(tempFile), RDFFormat.SPARQL);
-        } catch (Exception e) {
-            if (tempFile != null) tempFile.delete();
-            throw new RepositoryException("Error querying remote repository", e);
-        } finally {
-            logger.info("Exiting getTuples");
-        }
-    }
-
-    private String getQueryURL(Map params) {
-        params.put("type", "tuples");
-        params.put("format", RDFFormat.SPARQL.getName());
-        StringBuffer url = new StringBuffer();
-        url.append(m_fedoraBaseURL);
-        url.append("risearch?");
-        Iterator iter = params.keySet().iterator();
-        int n = 0;
-        while (iter.hasNext()) {
-            String name = (String) iter.next();
-            if (n > 0) {
-                url.append("&");
-            }
-            n++;
-            url.append(name);
-            url.append('=');
-            try {
-                url.append(URLEncoder.encode((String) params.get(name), "UTF-8"));
-            } catch (UnsupportedEncodingException e) { // UTF-8 won't fail
-            }
-        }
-        return url.toString();
-    }
 
     /**
      * @param props
