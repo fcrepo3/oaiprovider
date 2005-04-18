@@ -57,8 +57,6 @@ public class FedoraOAIDriver implements OAIDriver {
     
     private Collection m_metadataFormats;
 
-    private Downloader m_downloader;
-
     private FedoraClient m_fedora;
     
     public FedoraOAIDriver() {
@@ -99,14 +97,7 @@ public class FedoraOAIDriver implements OAIDriver {
         }
 
         try {
-            URL baseURL = new URL(m_fedoraBaseURL);
-            String h = baseURL.getHost();
-            int p = baseURL.getPort();
-            if (p < 0) p = baseURL.getDefaultPort();
-            m_downloader = new Downloader(h, p, m_fedoraUser, m_fedoraPass);
-
             m_fedora = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
-
         } catch (Exception e) {
             throw new RepositoryException("Error parsing baseURL", e);
         }
