@@ -29,18 +29,4 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="SetInfo.xml" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="SetInfo.xml1.0" LABEL="Dublin Core Metadata"
-      MIMETYPE="text/xml">
-      <foxml:xmlContent>
-        <setDescriptions>
-          <setDescription>
-            <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
-              <dc:description>This is the set of items whose identifier's numeric part is greater than two and odd</dc:description>
-            </oai_dc:dc>
-          </setDescription>
-        </setDescriptions>
-      </foxml:xmlContent>
-    </foxml:datastreamVersion>
-  </foxml:datastream>
 </foxml:digitalObject>
