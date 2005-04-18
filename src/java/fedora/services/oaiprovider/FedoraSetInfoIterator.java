@@ -19,10 +19,9 @@ public class FedoraSetInfoIterator implements RemoteIterator {
 
     private TupleIterator m_tuples;
 
-    private SetInfo m_next;
+    private List m_nextGroup;
 
-    private String m_priorSetSpec;
-    private String m_priorSetName;
+    private SetInfo m_next;
 
     /**
      * Initialize with tuples.
@@ -41,12 +40,19 @@ public class FedoraSetInfoIterator implements RemoteIterator {
      */
     public FedoraSetInfoIterator(TupleIterator tuples) throws RepositoryException {
         m_tuples = tuples;
+        m_nextGroup = new ArrayList();
         m_next = getNext();
     }
 
     private SetInfo getNext() throws RepositoryException {
         try {
+            List group = getNextGroup();
+            if (group.size() == 0) return null;
+            String[] values = (String[]) group.get(group.size() - 1);
+            return new FedoraSetInfo(values[0], values[1], values[2]);
+/*
             if (m_tuples.hasNext()) {
+                List group = getNextGroup();
                 String[] values = getValues(m_tuples.next());
                 String setSpec = values[0];
                 String setName = values[1];
@@ -54,15 +60,54 @@ public class FedoraSetInfoIterator implements RemoteIterator {
                 if (setDiss != null) {
                     return new FedoraSetInfo(setSpec, setName, setDiss);
                 } else {
-                    return new FedoraSetInfo(setSpec, setName, setDiss);
+                    if (m_tuples.hasNext()) {
+                        String[] nextValues = getValues(m_tuples.next());
+                        String nextSetSpec = nextValues[0];
+                        String nextSetName = nextValues[1];
+                        String nextSetDiss = nextValues[2];
+                        if (nextSetSpec.equals(setSpec)) {
+                        } else {
+                        }
+                    } else {
+                        return new FedoraSetInfo(setSpec, setName, setDiss);
+                    }
                     // if setDiss is null, check if it hasNext()
                 }
             } else {
                 return null;
             }
+*/
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
         }
+    }
+
+    /**
+     * Return the next group of value[]s that have the same value for the first element.
+     * The first element must not be null.
+     */
+    private List getNextGroup() throws RepositoryException,
+                                       TrippiException {
+        List group = m_nextGroup;
+        m_nextGroup = new ArrayList();
+        String commonValue = null;
+        if (group.size() > 0) {
+            commonValue = ((String[]) group.get(0))[0];
+        }
+        while (m_tuples.hasNext() && m_nextGroup.size() == 0) {
+            String[] values = getValues(m_tuples.next());
+            String firstValue = values[0];
+            if (firstValue == null) throw new RepositoryException("Not allowed: First value in tuple was null");
+            if (commonValue == null) {
+                commonValue = firstValue;
+            }
+            if (firstValue.equals(commonValue)) {
+                group.add(values);
+            } else {
+                m_nextGroup.add(values);
+            }
+        }
+        return group;
     }
 
     private String[] getValues(Map valueMap) throws RepositoryException {
