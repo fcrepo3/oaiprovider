@@ -5,6 +5,7 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 
+import org.apache.log4j.*;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.URIReference;
 import org.trippi.*;
@@ -21,6 +22,9 @@ import proai.error.*;
  * @author Edwin Shin, cwilper@cs.cornell.edu
  */
 public class FedoraOAIDriver implements OAIDriver {
+
+    private static final Logger logger =
+            Logger.getLogger(FedoraOAIDriver.class.getName());
 
     public static final String NS = "driver.fedora.";
 
@@ -148,32 +152,7 @@ public class FedoraOAIDriver implements OAIDriver {
     }
 
     public RemoteIterator listSetInfo() throws RepositoryException {
-        Map parms = m_queryFactory.setInfoQuery();
-        TupleIterator tuples = null;
-        try {
-            tuples = getTuples(parms);
-            while (tuples.hasNext()) {
-                Map tuple = tuples.next();
-                Literal setSpecLiteral = (Literal) tuple.get("setSpec");
-                if (setSpecLiteral == null) throw new RepositoryException("Unexpected: got null setSpec");
-                String setSpec = setSpecLiteral.getLexicalForm();
-                Literal setNameLiteral = (Literal) tuple.get("setName");
-                if (setNameLiteral == null) throw new RepositoryException("Unexpected: got null setName");
-                String setName = setNameLiteral.getLexicalForm();
-                URIReference setDissReference = (URIReference) tuple.get("setDiss");
-                if (setDissReference == null) {
-                    System.out.println(setSpec + " -> " + setName);
-                } else {
-                    String setDiss = setDissReference.getURI().toString();
-                    System.out.println(setSpec + " -> " + setName + " -> " + setDiss);
-                }
-            }
-        } catch (Exception e) {
-            throw new RepositoryException("Error querying for set information", e);
-        } finally {
-            if (tuples != null) try { tuples.close(); } catch (Exception e) { }
-        }
-        return null;
+        return new FedoraSetInfoIterator(getTuples(m_queryFactory.setInfoQuery()));
     }
 
     public RemoteIterator listRecords(Date from, 
@@ -194,17 +173,22 @@ public class FedoraOAIDriver implements OAIDriver {
     //////////////////////////////////////////////////////////////////////////
 
     private TupleIterator getTuples(Map params) throws RepositoryException {
+        if (logger.isInfoEnabled()) {
+            String query = (String) params.get("query");
+            logger.info("Entered getTuples.  Query follows:\n" + query);
+        }
         File tempFile = null;
         try {
             tempFile = File.createTempFile("proai-fedora-queryresult", ".xml");
             tempFile.deleteOnExit();
             String url = getQueryURL(params);
-            System.out.println(url);
             m_downloader.get(url, new FileOutputStream(tempFile));
             return TupleIterator.fromStream(new FileInputStream(tempFile), RDFFormat.SPARQL);
         } catch (Exception e) {
             if (tempFile != null) tempFile.delete();
             throw new RepositoryException("Error querying remote repository", e);
+        } finally {
+            logger.info("Exiting getTuples");
         }
     }
 
@@ -262,6 +246,7 @@ public class FedoraOAIDriver implements OAIDriver {
         if (val == null) {
             throw new RepositoryException("Required property is not set: " + key);
         } else {
+            logger.debug(key + " = " + val);
             return val;
         }
     }

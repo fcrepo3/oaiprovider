@@ -26,12 +26,12 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
 
     public Map latestRecordDateQuery() {
-        String query = "select $date "
-                     + "from <#ri> "
-                     + "where $object <" + m_oaiItemID + "> $oaiItemID "
-                       + "and $object <" + VIEW.DISSEMINATES.uri + "> $diss " 
-                       + "and $diss <" + VIEW.LAST_MODIFIED_DATE + "> $date "
-                     + "order by $date desc "
+        String query = "select $date\n"
+                     + "from <#ri>\n"
+                     + "where $object <" + m_oaiItemID + "> $oaiItemID\n"
+                     + "and $object <" + VIEW.DISSEMINATES.uri + "> $diss\n" 
+                     + "and $diss <" + VIEW.LAST_MODIFIED_DATE + "> $date\n"
+                     + "order by $date desc\n"
                      + "limit 1";
         Map map = new HashMap();
         map.put("lang", "itql");
@@ -40,15 +40,13 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
 
     public Map setInfoQuery() {
-        String query = "select $setSpec $setName $setDiss "
-                     + "from <#ri> "
-                     + "where $set <" + m_setSpec + "> $setSpec "
-                     + "and $set <" + m_setSpecName + "> $setName "
-                     + "and ($set <" + m_setSpecName + "> $anything "
-                          + "or ($set <" + VIEW.DISSEMINATES.uri + "> $setDiss "
-                               + "and $setDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + m_setSpecDissType + ">"
-                          + ")"
-                     + ")";
+        String query = "select $setSpec $setName $setDiss\n"
+                     + "from <#ri>\n"
+                     + "where $set <" + m_setSpec + "> $setSpec\n"
+                     + "and $set <" + m_setSpecName + "> $setName\n"
+                     + "and ($set <" + m_setSpecName + "> $anything\n"
+                     + "    or ($set <" + VIEW.DISSEMINATES.uri + "> $setDiss\n"
+                     + "       and $setDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + m_setSpecDissType + ">))";
         Map map = new HashMap();
         map.put("lang", "itql");
         map.put("query", query);
