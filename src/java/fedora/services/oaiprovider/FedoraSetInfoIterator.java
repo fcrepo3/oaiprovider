@@ -50,33 +50,6 @@ public class FedoraSetInfoIterator implements RemoteIterator {
             if (group.size() == 0) return null;
             String[] values = (String[]) group.get(group.size() - 1);
             return new FedoraSetInfo(values[0], values[1], values[2]);
-/*
-            if (m_tuples.hasNext()) {
-                List group = getNextGroup();
-                String[] values = getValues(m_tuples.next());
-                String setSpec = values[0];
-                String setName = values[1];
-                String setDiss = values[2];
-                if (setDiss != null) {
-                    return new FedoraSetInfo(setSpec, setName, setDiss);
-                } else {
-                    if (m_tuples.hasNext()) {
-                        String[] nextValues = getValues(m_tuples.next());
-                        String nextSetSpec = nextValues[0];
-                        String nextSetName = nextValues[1];
-                        String nextSetDiss = nextValues[2];
-                        if (nextSetSpec.equals(setSpec)) {
-                        } else {
-                        }
-                    } else {
-                        return new FedoraSetInfo(setSpec, setName, setDiss);
-                    }
-                    // if setDiss is null, check if it hasNext()
-                }
-            } else {
-                return null;
-            }
-*/
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
         }
@@ -133,36 +106,6 @@ public class FedoraSetInfoIterator implements RemoteIterator {
            throw new RepositoryException("Unhandled node type: " + node.getClass().getName());
        }
     }
-
-
-/*
-        Map parms = m_queryFactory.setInfoQuery();
-        TupleIterator tuples = null;
-        try {
-            tuples = getTuples(parms);
-            while (tuples.hasNext()) {
-                Map tuple = tuples.next();
-                Literal setSpecLiteral = (Literal) tuple.get("setSpec");
-                if (setSpecLiteral == null) throw new RepositoryException("Unexpected: got null setSpec");
-                String setSpec = setSpecLiteral.getLexicalForm();
-                Literal setNameLiteral = (Literal) tuple.get("setName");
-                if (setNameLiteral == null) throw new RepositoryException("Unexpected: got null setName");
-                String setName = setNameLiteral.getLexicalForm();
-                URIReference setDissReference = (URIReference) tuple.get("setDiss");
-                if (setDissReference == null) {
-                    System.out.println(setSpec + " -> " + setName);
-                } else {
-                    String setDiss = setDissReference.getURI().toString();
-                    System.out.println(setSpec + " -> " + setName + " -> " + setDiss);
-                }
-            }
-        } catch (Exception e) {
-            throw new RepositoryException("Error querying for set information", e);
-        } finally {
-            if (tuples != null) try { tuples.close(); } catch (Exception e) { }
-        }
-        return null;
-*/
 
     public boolean hasNext() throws RepositoryException {
         return (m_next != null);

@@ -16,7 +16,9 @@ public class FedoraSetInfo implements SetInfo {
     private String m_setDiss;
    
     // if setDiss is null, descriptions don't exist, which is ok
-    public FedoraSetInfo(String setSpec, String setName, String setDiss) {
+    public FedoraSetInfo(String setSpec, 
+                         String setName, 
+                         String setDiss) {
         m_setSpec = setSpec;
         m_setName = setName;
         m_setDiss = setDiss;
