@@ -157,7 +157,7 @@ public class FedoraOAIDriver implements OAIDriver {
                                       String mdPrefix, 
                                       boolean withContent) throws RepositoryException {
         // TODO Auto-generated method stub
-        return null;
+        return new RemoteIteratorImpl(new ArrayList().iterator());
     }
 
     public void close() throws RepositoryException {
