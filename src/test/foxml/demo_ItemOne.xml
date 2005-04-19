@@ -52,4 +52,31 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="about_oai_dc" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="about_oai_dc.0" LABEL="about_oai_dc" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <abouts>
+          <about>
+            <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" 
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance
+                                    http://www.openarchives.org/OAI/2.0/provenance.xsd">
+              <originDescription harvestDate="2002-02-02T14:10:02Z" altered="true">
+                <baseURL>http://the.oa.org</baseURL>
+                <identifier>oai:r2:klik001</identifier>
+                <datestamp>2002-01-01</datestamp>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+              </originDescription>
+            </provenance>
+          </about>
+          <about>
+            <sample xmlns="http://example.org/sample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://example.org/sample http://example.org/sample.xsd">
+              <sample-element>text</sample-element>
+            </sample>
+          </about>
+        </abouts>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
 </foxml:digitalObject>

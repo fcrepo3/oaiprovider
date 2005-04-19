@@ -54,4 +54,32 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="about_oai_dc" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="about_oai_dc.0" LABEL="about_oai_dc" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <abouts>
+          <about>
+            <sample xmlns="http://example.org/sample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://example.org/sample http://example.org/sample.xsd">
+              <sample-element>text</sample-element>
+            </sample>
+          </about>
+        </abouts>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="about_test_format" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="about_test_format.0" LABEL="about_test_format" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <abouts>
+          <about>
+            <sample xmlns="http://example.org/sample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://example.org/sample http://example.org/sample.xsd">
+              <sample-element>text</sample-element>
+            </sample>
+          </about>
+        </abouts>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
 </foxml:digitalObject>
