@@ -57,7 +57,7 @@ public class FedoraClient {
     private String getURL(String locator) throws IOException {
         String url;
         if (locator.startsWith(FEDORA_URI_PREFIX)) {
-            url = m_baseURL + "get/" + locator.substring(FEDORA_URI_PREFIX.length() + 1);
+            url = m_baseURL + "get/" + locator.substring(FEDORA_URI_PREFIX.length());
         } else if (locator.startsWith("http://")) {
             url = locator;
         } else if (locator.startsWith("/")) {

@@ -17,6 +17,7 @@ public class FedoraSetInfoIterator implements RemoteIterator {
     private static final Logger logger =
             Logger.getLogger(FedoraOAIDriver.class.getName());
 
+    private FedoraClient m_fedora;
     private TupleIterator m_tuples;
 
     private List m_nextGroup;
@@ -38,7 +39,9 @@ public class FedoraSetInfoIterator implements RemoteIterator {
      * abovetwo     ,Above Two         ,info:fedora/demo:SetAboveTwo/SetInfo.xml
      * </pre>
      */
-    public FedoraSetInfoIterator(TupleIterator tuples) throws RepositoryException {
+    public FedoraSetInfoIterator(FedoraClient fedora,
+                                 TupleIterator tuples) throws RepositoryException {
+        m_fedora = fedora;
         m_tuples = tuples;
         m_nextGroup = new ArrayList();
         m_next = getNext();
@@ -49,7 +52,7 @@ public class FedoraSetInfoIterator implements RemoteIterator {
             List group = getNextGroup();
             if (group.size() == 0) return null;
             String[] values = (String[]) group.get(group.size() - 1);
-            return new FedoraSetInfo(values[0], values[1], values[2]);
+            return new FedoraSetInfo(m_fedora, values[0], values[1], values[2]);
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
         }

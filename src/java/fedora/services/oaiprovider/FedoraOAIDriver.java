@@ -149,7 +149,7 @@ public class FedoraOAIDriver implements OAIDriver {
         } catch (IOException e) {
             throw new RepositoryException("Error getting tuples from Fedora", e);
         }
-        return new FedoraSetInfoIterator(tuples);
+        return new FedoraSetInfoIterator(m_fedora, tuples);
     }
 
     public RemoteIterator listRecords(Date from, 
