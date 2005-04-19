@@ -48,7 +48,11 @@ public class FedoraClient {
         HttpInputStream in = new HttpInputStream(client, getMethod, url);
         if (failIfNotOK) {
             if (in.getStatusCode() != 200) {
-                throw new IOException("Request failed [" + in.getStatusCode() + " " + in.getStatusText() + "]");
+                try { 
+                    throw new IOException("Request failed [" + in.getStatusCode() + " " + in.getStatusText() + "]");
+                } finally {
+                    try { in.close(); } catch (Exception e) { }
+                }
             }
         }
         return in;
