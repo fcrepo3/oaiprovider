@@ -10,5 +10,7 @@ public interface QueryFactory {
     public Map latestRecordDateQuery();
 
     public Map setInfoQuery();
+    
+    public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, boolean withContent);
 
 }

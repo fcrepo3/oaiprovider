@@ -7,10 +7,7 @@ import java.util.*;
 
 import org.apache.log4j.*;
 import org.jrdf.graph.Literal;
-import org.jrdf.graph.URIReference;
 import org.trippi.*;
-
-import fedora.client.Downloader;
 
 import proai.driver.impl.*;
 import proai.driver.*;
@@ -35,14 +32,17 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_ITEMID           = NS + "itemID";
     public static final String PROP_SETSPEC          = NS + "setSpec";
     public static final String PROP_SETSPEC_NAME     = NS + "setSpec.name";
-    public static final String PROP_SETSPEC_DISSTYPE = NS + "setSpec.dissType";
+    public static final String PROP_SETSPEC_DESC_DISSTYPE = NS + "setSpec.desc.dissType";
     public static final String PROP_QUERY_FACTORY    = NS + "queryFactory";
     public static final String PROP_FORMATS          = NS + "md.formats";
     public static final String PROP_FORMAT_START     = NS + "md.format.";
+    public static final String PROP_DELETED          = NS + "deleted";
     public static final String PROP_FORMAT_PFX_END        = ".mdPrefix";
     public static final String PROP_FORMAT_LOC_END        = ".loc";
     public static final String PROP_FORMAT_URI_END        = ".uri";
     public static final String PROP_FORMAT_DISSTYPE_END   = ".dissType";
+    public static final String PROP_ITEM_SETSPEC_PATH    = NS + "itemSetSpecPath";
+    public static final String PROP_ABOUT_DISSTYPE   = NS + "about.dissType";
 
     private QueryFactory m_queryFactory;
     private URL m_identify;
@@ -55,7 +55,7 @@ public class FedoraOAIDriver implements OAIDriver {
     private String m_setSpecName;
     private String m_setSpecDissType;
     
-    private Collection m_metadataFormats;
+    private Map m_metadataFormats;
 
     private FedoraClient m_fedora;
     
@@ -72,10 +72,6 @@ public class FedoraOAIDriver implements OAIDriver {
         if (!m_fedoraBaseURL.endsWith("/")) m_fedoraBaseURL += "/";
         m_fedoraUser      = getRequired(props, PROP_USER); 
         m_fedoraPass      = getRequired(props, PROP_PASS); 
-        m_itemID          = getRequired(props, PROP_ITEMID);
-        m_setSpec         = getRequired(props, PROP_SETSPEC);
-        m_setSpecName     = getRequired(props, PROP_SETSPEC_NAME);
-        m_setSpecDissType = getRequired(props, PROP_SETSPEC_DISSTYPE);
 
         m_metadataFormats = getMetadataFormats(props);
 
@@ -116,6 +112,7 @@ public class FedoraOAIDriver implements OAIDriver {
         }
     }
 
+    // TODO: date for volatile disseminations?
     public Date getLatestDate() throws RepositoryException {
         Map parms = m_queryFactory.latestRecordDateQuery();
         TupleIterator tuples = null;
@@ -139,7 +136,7 @@ public class FedoraOAIDriver implements OAIDriver {
     }
 
     public RemoteIterator listMetadataFormats() throws RepositoryException {
-        return new RemoteIteratorImpl(m_metadataFormats.iterator());
+        return new RemoteIteratorImpl(m_metadataFormats.values().iterator());
     }
 
     public RemoteIterator listSetInfo() throws RepositoryException {
@@ -156,8 +153,20 @@ public class FedoraOAIDriver implements OAIDriver {
                                       Date until, 
                                       String mdPrefix, 
                                       boolean withContent) throws RepositoryException {
-        // TODO Auto-generated method stub
-        return new RemoteIteratorImpl(new ArrayList().iterator());
+        if (from != null && until != null && from.after(until)) {
+            throw new RepositoryException("from date cannot be later than until date.");
+        }
+        String mdPrefixDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getDissType();
+        
+        Map map = m_queryFactory.listRecordsQuery(from, until, mdPrefixDissType, withContent);
+        
+        TupleIterator tuples = null;
+        try {
+            tuples = m_fedora.getTuples(map);
+        } catch (IOException e) {
+            throw new RepositoryException("Error getting tuples from Fedora", e);
+        }
+        return new FedoraRecordIterator(m_fedora, tuples);
     }
 
     public void close() throws RepositoryException {
@@ -172,9 +181,10 @@ public class FedoraOAIDriver implements OAIDriver {
     /**
      * @param props
      */
-    private Collection getMetadataFormats(Properties props) throws RepositoryException {
+    private Map getMetadataFormats(Properties props) throws RepositoryException {
         String formats[], prefix, namespaceURI, schemaLocation, dissType;
-        List list = new ArrayList();
+        FedoraMetadataFormat mf;
+        Map map = new HashMap();
         
         // step through formats, getting appropriate properties for each
         formats = getRequired(props, PROP_FORMATS).split(" ");
@@ -185,12 +195,13 @@ public class FedoraOAIDriver implements OAIDriver {
             dissType       = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_DISSTYPE_END);
             String otherPrefix = props.getProperty(PROP_FORMAT_START + prefix + PROP_FORMAT_PFX_END);
             if (otherPrefix != null) prefix = otherPrefix;
-            list.add(new FedoraMetadataFormat(prefix, 
-                                              namespaceURI, 
-                                              schemaLocation, 
-                                              dissType));
+            mf = new FedoraMetadataFormat(prefix, 
+                                          namespaceURI, 
+                                          schemaLocation, 
+                                          dissType);
+            map.put(prefix, mf);
         }
-        return list;
+        return map;
     }
     
     protected static String getRequired(Properties props, String key) 
@@ -200,7 +211,17 @@ public class FedoraOAIDriver implements OAIDriver {
             throw new RepositoryException("Required property is not set: " + key);
         } else {
             logger.debug(key + " = " + val);
-            return val;
+            return val.trim();
+        }
+    }
+    
+    protected static String getOptional(Properties props, String key) {
+        String val = props.getProperty(key);
+        logger.debug(key + " = " + val);
+        if (val == null) {
+            return "";
+        } else {
+            return val.trim();
         }
     }
 
