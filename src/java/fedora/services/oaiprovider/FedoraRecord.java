@@ -18,7 +18,7 @@ public class FedoraRecord implements Record {
     private String m_itemID;
     private String m_recordDiss;
     private String m_date;
-    private String m_deleted;
+    private boolean m_deleted;
     private String[] m_setSpecs;
     private String m_aboutDiss;
     
@@ -26,11 +26,16 @@ public class FedoraRecord implements Record {
                         String itemID, 
                         String recordDiss, 
                         String date, 
-                        String deleted, 
+                        boolean deleted, 
                         String[] setSpecs, 
                         String aboutDiss) {
         m_fedora = fedora;
         m_itemID = itemID;
+        m_recordDiss = recordDiss;
+        m_date = date;
+        m_deleted = deleted;
+        m_setSpecs = setSpecs;
+        m_aboutDiss = aboutDiss;
     }
 
     /* (non-Javadoc)
@@ -43,21 +48,52 @@ public class FedoraRecord implements Record {
     public void write(PrintWriter out) throws ServerException {
         out.println("<record>");
         writeHeader(out);
-
-        // TODO
-        
-        writeAbouts(out);
+        if (!m_deleted) {
+            writeMetadata(out);
+            writeAbouts(out);
+        }
         out.println("</record>");
     }
     
     private void writeHeader(PrintWriter out) {
-        out.println("  <header>");
+        if (m_deleted) {
+            out.println("  <header status=\"deleted\">");
+        } else {
+            out.println("  <header>");
+        }
         out.println("    <identifier>" + m_itemID + "</identifier>");
         out.println("    <datestamp>" + m_date + "</datestamp>");
         for (int i = 0; i < m_setSpecs.length; i++) {
             out.println("    <setSpec>" + m_setSpecs[i] + "</setSpec>");
         }
         out.println("  </header>");
+    }
+    
+    private void writeMetadata(PrintWriter out) {
+        String metadataStart = "<metadata>";
+        String metadataEnd = "</metadata>";
+        InputStream in = null;
+        try {
+            in = m_fedora.get(m_recordDiss, true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer buf = new StringBuffer();
+            String line = reader.readLine();
+            while (line != null) {
+                buf.append(line + "\n");
+                line = reader.readLine();
+            }
+            String xml = buf.toString();
+            int i = xml.indexOf(metadataStart);
+            if (i == -1) throw new RepositoryException("Bad metadata xml: opening " + metadataStart + " not found");
+            xml = xml.substring(i);
+            i = xml.lastIndexOf(metadataEnd);
+            if (i == -1) throw new RepositoryException("Bad abouts xml: closing " + metadataEnd + " not found");
+            out.print(xml.substring(0, i + metadataEnd.length()));
+        } catch (IOException e) {
+            throw new RepositoryException("IO error reading " + m_aboutDiss, e);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException e) { }
+        }
     }
     
     private void writeAbouts(PrintWriter out) {
