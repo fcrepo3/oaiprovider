@@ -34,7 +34,7 @@ public class FedoraSetInfo implements SetInfo {
     public void write(PrintWriter out) throws RepositoryException {
         out.println("<set>");
         out.println("  <setSpec>" + m_setSpec + "</setSpec>");
-        out.println("  <setName>" + m_setSpec + "</setName>");
+        out.println("  <setName>" + m_setName + "</setName>");
         writeDescriptions(out);
         out.println("</set>");
     }
