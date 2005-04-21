@@ -65,45 +65,54 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     
     public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, 
                                 boolean withContent) {
+        boolean set = !m_setSpec.equals("");
+        boolean about = !m_aboutDissType.equals("");
+        String setSpec = set ? "$setSpec" : "";
+        String aboutDiss = about ? "$aboutDiss" : "";
+        
         StringBuffer query = new StringBuffer();
         // base query
-        query.append("select $itemID $recordDiss $date $deleted $setSpec $aboutDiss " +
-                     "from <#ri> " +
-                     "where $item <" + m_oaiItemID + "> $itemID " +
-                     "and $item <" + VIEW.DISSEMINATES.uri + "> $recordDiss " +
-                     "and $recordDiss <" + VIEW.LAST_MODIFIED_DATE + "> $date " +
-                     "and $recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + "> ");
+        query.append("select $itemID $recordDiss $date $deleted " + setSpec + " " + aboutDiss + "\n " +
+                     "from <#ri>\n " +
+                     "where $item <" + m_oaiItemID + "> $itemID\n " +
+                     "and $item <" + VIEW.DISSEMINATES.uri + "> $recordDiss\n " +
+                     "and $recordDiss <" + VIEW.LAST_MODIFIED_DATE + "> $date\n " +
+                     "and $recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + ">\n ");
         
         // FedoraOAIDriver.PROP_DELETED is an optional, object-level (as opposed
         // to dissemination-level) property. If present, use it in place of
         // Fedora state.
         // TODO: configurable values for deleted, when property is user-defined?
         if (m_deleted.equals("")) {
-            query.append("and $recordDiss <" + MODEL.STATE + "> $deleted ");
+            query.append("and $recordDiss <" + MODEL.STATE + "> $deleted\n ");
         } else {
-            query.append("and $item <" + m_deleted + "> $deleted ");
+            query.append("and $item <" + m_deleted + "> $deleted\n ");
         }
         
         // From and until dates are optional
         // TODO: check inclusive/exclusive
         if (from != null) {
-            query.append("and $date <" + TUCANA.AFTER + "> '" + DateUtility.convertDateToString(from) + "' in <#xsd> ");
+            query.append("and $date <" + TUCANA.AFTER + "> '" + 
+                         DateUtility.convertDateToString(from) + 
+                         "' in <#xsd>\n ");
         }
         if (until != null) {
-            query.append("and $date <" + TUCANA.BEFORE + "> '" + DateUtility.convertDateToString(until) + "' in <#xsd> ");
+            query.append("and $date <" + TUCANA.BEFORE + "> '" + 
+                         DateUtility.convertDateToString(until) + 
+                         "' in <#xsd>\n ");
         }
         
         // Set information is optional
-        if (!m_setSpec.equals("")) {
-            query.append("and ($recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + "> " +
-                         "     or (" + m_itemSetSpecPath + ") ");
+        if (set) {
+            query.append("and ($recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + ">\n " +
+                         "     or (" + m_itemSetSpecPath + "))\n ");
         }
         
         // about is optional
-        if (!m_aboutDissType.equals("")) {
-            query.append("and ($recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + "> " +
-                         "     or ($item <" + VIEW.DISSEMINATES + "> $aboutDiss " +
-                         "         and $aboutDiss <" + m_aboutDissType + ">)) ");
+        if (about) {
+            query.append("and ($recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + ">\n " +
+                         "     or ($item <" + VIEW.DISSEMINATES + "> $aboutDiss\n " +
+                         "         and $aboutDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + m_aboutDissType + ">))\n ");
         }
         
         query.append("order by $itemID asc ");
