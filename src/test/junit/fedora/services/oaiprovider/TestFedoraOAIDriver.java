@@ -9,8 +9,6 @@ import junit.framework.*;
 import proai.*;
 import proai.driver.*;
 
-import fedora.services.oaiprovider.*;
-
 /**
  * @author Edwin Shin
  */

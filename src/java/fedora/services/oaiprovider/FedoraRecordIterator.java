@@ -86,8 +86,6 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
     
     // helper methods
     private Record getNext() throws RepositoryException {
-        System.out.println("********************************");
-        System.out.println("* FedoraRecordIterator.getNext()");
         try {
             List group = getNextGroup();
             if (group.size() == 0) return null;
@@ -102,41 +100,28 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
             
             String[] values;
             while (it.hasNext() && !deleted) {
-                System.out.println("* iterating values for " + itemID);
                 values = (String[])it.next();
-                itemID = values[0];
-                recordDiss = values[1];
-                date = values[2];
+                if (itemID == null) itemID = values[0];
+                if (recordDiss == null) recordDiss = values[1];
+                if (date == null) date = values[2];
                 deleted = !values[3].equals(MODEL.ACTIVE.uri);
                 if (values[4] != null && !values[4].equals("")) {
                     sets.add(values[4]);
                 }
                 
-                if (values[5] != null && !values[5].equals("")) {
+                if (aboutDiss == null && values[5] != null && !values[5].equals("")) {
                     aboutDiss = values[5];
                 }
             }
-            System.out.println("* final values: ");
-            System.out.println("*itemID: " + itemID);
-            System.out.println("*recordDiss: " + recordDiss);
-            System.out.println("*date: " + date);
-            System.out.println("*deleted: " + deleted );
-            System.out.println("*setSpec size: " + sets.size());
-            System.out.println("*aboutDiss: " + aboutDiss);
-            
             String[] setSpecs = new String[sets.size()];
-            // FIXME
-            // itemID   recordDiss   date   deleted   setSpec   aboutDiss
-            return new FedoraRecord(m_fedora, itemID, recordDiss, date, deleted, (String[])sets.toArray(setSpecs), aboutDiss);
-            /*
-             * FedoraClient fedora, 
-                        String itemID, 
-                        String recordDiss, 
-                        String date, 
-                        boolean deleted, 
-                        String[] setSpecs, 
-                        String aboutDiss) {
-             */
+            
+            return new FedoraRecord(m_fedora, 
+                                    itemID, 
+                                    recordDiss, 
+                                    date, 
+                                    deleted, 
+                                    (String[])sets.toArray(setSpecs), 
+                                    aboutDiss);
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
         }
@@ -155,7 +140,6 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
             commonValue = ((String[]) group.get(0))[0];
         }
         while (m_tuples.hasNext() && m_nextGroup.size() == 0) {
-            System.out.println("=========================================");
             String[] values = getValues(m_tuples.next());
             String firstValue = values[0];
             if (firstValue == null) throw new RepositoryException("Not allowed: First value in tuple was null");
@@ -175,20 +159,9 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
         try {
             String[] names = m_tuples.names();
             String[] values = new String[names.length];
-            Iterator it;
-            it = (valueMap.keySet()).iterator();
-            while (it.hasNext()) {
-                System.out.println("< " +it.next());
-            }
-            
-            it = (valueMap.values()).iterator();
-            while (it.hasNext()) {
-                System.out.println("> " +getString((Node)it.next()));
-            }
             
             for (int i = 0; i < names.length; i++) {
                 values[i] = getString((Node) valueMap.get(names[i]));
-                System.out.println("? " + names[i] + ": " + values[i]);
             }
             return values;
         } catch (Exception e) {

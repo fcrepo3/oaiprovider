@@ -19,9 +19,9 @@ public class TestFedoraRecordIterator extends TestCase {
     public void testFoo() throws Exception {
         TupleIterator ti = TupleIterator.fromStream(new FileInputStream("src/test/junit/risearch.sparql"), RDFFormat.SPARQL);
         FedoraRecordIterator fri = new FedoraRecordIterator(null, ti);
-        //while (fri.hasNext()) {
-        //    fri.next();
-        //}
+        while (fri.hasNext()) {
+            fri.next();
+        }
         
     }
 }
