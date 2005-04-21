@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sparql xmlns="http://www.w3.org/2001/sw/DataAccess/rf1/result">
+  <head>
+    <variable name="itemID"/>
+    <variable name="recordDiss"/>
+    <variable name="date"/>
+    <variable name="state"/>
+    <variable name="setSpec"/>
+    <variable name="aboutDiss"/>
+  </head>
+  <results>
+    <result>
+      <itemID>oai:example.org:item1</itemID>
+      <recordDiss uri="info:fedora/demo:ItemOne/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:27.78</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss uri="info:fedora/demo:ItemOne/about_oai_dc"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item1</itemID>
+      <recordDiss uri="info:fedora/demo:ItemOne/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:27.78</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item2</itemID>
+      <recordDiss uri="info:fedora/demo:ItemTwo/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:47.727</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item2</itemID>
+      <recordDiss uri="info:fedora/demo:ItemTwo/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:47.727</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>prime</setSpec>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss uri="info:fedora/demo:ItemThree/about_oai_dc"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>abovetwo:odd</setSpec>
+      <aboutDiss uri="info:fedora/demo:ItemThree/about_oai_dc"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>prime</setSpec>
+      <aboutDiss uri="info:fedora/demo:ItemThree/about_oai_dc"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>prime</setSpec>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item3</itemID>
+      <recordDiss uri="info:fedora/demo:ItemThree/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:40.029</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>abovetwo:odd</setSpec>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item4</itemID>
+      <recordDiss uri="info:fedora/demo:ItemFour/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:36.097</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec bound="false"/>
+      <aboutDiss bound="false"/>
+    </result>
+    <result>
+      <itemID>oai:example.org:item4</itemID>
+      <recordDiss uri="info:fedora/demo:ItemFour/oai_dc"/>
+      <date datatype="http://www.w3.org/2001/XMLSchema#dateTime">2005-04-21T02:49:36.097</date>
+      <state uri="info:fedora/fedora-system:def/model#Active"/>
+      <setSpec>abovetwo:even</setSpec>
+      <aboutDiss bound="false"/>
+    </result>
+  </results>
+</sparql>
