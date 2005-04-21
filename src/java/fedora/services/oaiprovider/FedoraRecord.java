@@ -50,7 +50,9 @@ public class FedoraRecord implements Record {
         writeHeader(out);
         if (!m_deleted) {
             writeMetadata(out);
-            writeAbouts(out);
+            if (m_aboutDiss != null && !m_aboutDiss.equals("")) {
+                writeAbouts(out);
+            }
         }
         out.println("</record>");
     }
@@ -70,8 +72,6 @@ public class FedoraRecord implements Record {
     }
     
     private void writeMetadata(PrintWriter out) {
-        String metadataStart = "<metadata>";
-        String metadataEnd = "</metadata>";
         InputStream in = null;
         try {
             in = m_fedora.get(m_recordDiss, true);
@@ -82,13 +82,9 @@ public class FedoraRecord implements Record {
                 buf.append(line + "\n");
                 line = reader.readLine();
             }
-            String xml = buf.toString();
-            int i = xml.indexOf(metadataStart);
-            if (i == -1) throw new RepositoryException("Bad metadata xml: opening " + metadataStart + " not found");
-            xml = xml.substring(i);
-            i = xml.lastIndexOf(metadataEnd);
-            if (i == -1) throw new RepositoryException("Bad abouts xml: closing " + metadataEnd + " not found");
-            out.print(xml.substring(0, i + metadataEnd.length()));
+            out.println("  <metadata>");
+            out.print(buf.toString());
+            out.println("  </metadata>");
         } catch (IOException e) {
             throw new RepositoryException("IO error reading " + m_aboutDiss, e);
         } finally {

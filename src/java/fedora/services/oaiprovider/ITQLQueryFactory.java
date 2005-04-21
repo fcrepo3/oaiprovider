@@ -130,6 +130,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
      or ($obj <fedora-view:disseminates> $aboutDiss
         and $aboutDiss <fedora-view:disseminationType>
     <info:fedora/* /about_oai_dc>))
+    order by $itemID asc 
 
 get item ids, dissem uris, and sets for all objects in a given format,
 even for items that are not in any sets
