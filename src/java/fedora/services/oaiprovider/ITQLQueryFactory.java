@@ -17,7 +17,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     private String m_itemSetSpecPath;
     private String m_setSpecDescDissType;
     private String m_deleted;
-    private String m_aboutDissType;
     
     public ITQLQueryFactory() {
     }
@@ -32,7 +31,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
             m_setSpecDescDissType = FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_SETSPEC_DESC_DISSTYPE);
         }
         m_deleted = FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_DELETED);
-        m_aboutDissType = FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_ABOUT_DISSTYPE);
     }
 
     public Map latestRecordDateQuery() {
@@ -64,9 +62,10 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
     
     public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, 
+                                String mdPrefixAboutDissType, 
                                 boolean withContent) {
         boolean set = !m_setSpec.equals("");
-        boolean about = !m_aboutDissType.equals("");
+        boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
         String setSpec = set ? "$setSpec" : "";
         String aboutDiss = about ? "$aboutDiss" : "";
         
@@ -112,7 +111,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         if (about) {
             query.append("and ($recordDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixDissType + ">\n " +
                          "     or ($item <" + VIEW.DISSEMINATES + "> $aboutDiss\n " +
-                         "         and $aboutDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + m_aboutDissType + ">))\n ");
+                         "         and $aboutDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + mdPrefixAboutDissType + ">))\n ");
         }
         
         query.append("order by $itemID asc ");

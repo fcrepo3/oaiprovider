@@ -11,6 +11,6 @@ public interface QueryFactory {
 
     public Map setInfoQuery();
     
-    public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, boolean withContent);
+    public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, String mdPrefixAboutDissType, boolean withContent);
 
 }

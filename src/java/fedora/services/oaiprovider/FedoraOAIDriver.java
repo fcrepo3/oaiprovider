@@ -41,8 +41,9 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_FORMAT_LOC_END        = ".loc";
     public static final String PROP_FORMAT_URI_END        = ".uri";
     public static final String PROP_FORMAT_DISSTYPE_END   = ".dissType";
-    public static final String PROP_ITEM_SETSPEC_PATH    = NS + "itemSetSpecPath";
-    public static final String PROP_ABOUT_DISSTYPE   = NS + "about.dissType";
+    public static final String PROP_FORMAT_ABOUT_END      = "about.dissType";
+    public static final String PROP_ITEM_SETSPEC_PATH     = NS + "itemSetSpecPath";
+    
 
     private QueryFactory m_queryFactory;
     private URL m_identify;
@@ -157,9 +158,9 @@ public class FedoraOAIDriver implements OAIDriver {
             throw new RepositoryException("from date cannot be later than until date.");
         }
         String mdPrefixDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getDissType();
-        
-        Map map = m_queryFactory.listRecordsQuery(from, until, mdPrefixDissType, withContent);
-        
+        String mdPrefixAboutDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getAbout();
+        Map map = m_queryFactory.listRecordsQuery(from, until, mdPrefixDissType, mdPrefixAboutDissType, withContent);
+        logger.error("***************************\n" + map.get("query"));
         TupleIterator tuples = null;
         try {
             tuples = m_fedora.getTuples(map);
@@ -182,7 +183,7 @@ public class FedoraOAIDriver implements OAIDriver {
      * @param props
      */
     private Map getMetadataFormats(Properties props) throws RepositoryException {
-        String formats[], prefix, namespaceURI, schemaLocation, dissType;
+        String formats[], prefix, namespaceURI, schemaLocation, dissType, about;
         FedoraMetadataFormat mf;
         Map map = new HashMap();
         
@@ -193,12 +194,15 @@ public class FedoraOAIDriver implements OAIDriver {
             namespaceURI   = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_URI_END);
             schemaLocation = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_LOC_END);
             dissType       = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_DISSTYPE_END);
+            about          = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_ABOUT_END);
+            
             String otherPrefix = props.getProperty(PROP_FORMAT_START + prefix + PROP_FORMAT_PFX_END);
             if (otherPrefix != null) prefix = otherPrefix;
             mf = new FedoraMetadataFormat(prefix, 
                                           namespaceURI, 
                                           schemaLocation, 
-                                          dissType);
+                                          dissType,
+                                          about);
             map.put(prefix, mf);
         }
         return map;
