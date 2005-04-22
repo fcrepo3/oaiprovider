@@ -160,7 +160,7 @@ public class FedoraOAIDriver implements OAIDriver {
         String mdPrefixDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getDissType();
         String mdPrefixAboutDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getAbout();
         Map map = m_queryFactory.listRecordsQuery(from, until, mdPrefixDissType, mdPrefixAboutDissType, withContent);
-        logger.error("***************************\n" + map.get("query"));
+        logger.info("listRecords() query:\n" + map.get("query"));
         TupleIterator tuples = null;
         try {
             tuples = m_fedora.getTuples(map);

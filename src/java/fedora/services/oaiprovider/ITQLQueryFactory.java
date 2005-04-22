@@ -124,21 +124,21 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
 
 /*
 
-    select $itemID $recordDiss $date $state $setSpec $aboutDiss
-    from <#ri>
-    where $obj <http://www.openarchives.org/OAI/2.0/itemID> $itemID
-    and $obj <fedora-view:disseminates> $recordDiss
-    and $obj <fedora-view:lastModifiedDate> $date
-    and $recordDiss <fedora-model:state> $state
-    and $recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
-    and ($recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
-     or ($obj <fedora-rels-ext:isMemberOf> $set
-       and $set <http://www.openarchives.org/OAI/2.0/setSpec> $setSpec))
-    and ($recordDiss <fedora-view:disseminationType> <info:fedora/* /oai_dc>
-     or ($obj <fedora-view:disseminates> $aboutDiss
-        and $aboutDiss <fedora-view:disseminationType>
-    <info:fedora/* /about_oai_dc>))
-    order by $itemID asc 
+select $itemID $recordDiss $date $deleted $setSpec $aboutDiss
+ from <#ri>
+ where $item <http://www.openarchives.org/OAI/2.0/itemID> $itemID
+ and $item <info:fedora/fedora-system:def/view#disseminates> $recordDiss
+ and $recordDiss <info:fedora/fedora-system:def/view#lastModifiedDate> $date
+ and $recordDiss <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/* /oai_dc>
+ and $recordDiss <info:fedora/fedora-system:def/model#state> $deleted
+ and $date <http://tucana.org/tucana#after> '1969-12-31T19:00:00.000Z' in <#xsd> 
+ and $date <http://tucana.org/tucana#before> '2005-04-21T17:23:26.124Z' in <#xsd>
+ and ($recordDiss <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/* /oai_dc>
+      or ($item <fedora-rels-ext:isMemberOf> $set and $set <http://www.openarchives.org/OAI/2.0/setSpec> $setSpec))
+ and ($recordDiss <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/* /oai_dc>
+      or ($item <info:fedora/fedora-system:def/view#disseminates> $aboutDiss
+          and $aboutDiss <info:fedora/fedora-system:def/view#disseminationType> <info:fedora/* /about_oai_dc>))
+ order by $itemID asc
 
 get item ids, dissem uris, and sets for all objects in a given format,
 even for items that are not in any sets
