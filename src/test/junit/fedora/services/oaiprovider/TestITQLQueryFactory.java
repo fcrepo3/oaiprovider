@@ -1,5 +1,6 @@
 package fedora.services.oaiprovider;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
@@ -25,7 +26,9 @@ public class TestITQLQueryFactory extends TestCase {
         QueryFactory qf = new ITQLQueryFactory();
         qf.init(props);
         
-        Map map = qf.listRecordsQuery(null, null, "info:fedora/*/oai_dc", "info:fedora/*/about_oai_dc", true);
+        Date df = new Date(0L);
+        Date du = new Date(1114185883000L);
+        Map map = qf.listRecordsQuery(df, du, "info:fedora/*/oai_dc", "info:fedora/*/about_oai_dc", true);
         System.out.println((String)map.get("query"));
     }
 

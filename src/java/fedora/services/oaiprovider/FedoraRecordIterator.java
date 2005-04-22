@@ -103,7 +103,10 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
                 values = (String[])it.next();
                 if (itemID == null) itemID = values[0];
                 if (recordDiss == null) recordDiss = values[1];
-                if (date == null) date = values[2];
+                if (date == null) {
+                    date = formatDatetime(values[2]);
+                }
+                
                 deleted = !values[3].equals(MODEL.ACTIVE.uri);
                 if (values[4] != null && !values[4].equals("")) {
                     sets.add(values[4]);
@@ -178,6 +181,28 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
        } else {
            throw new RepositoryException("Unhandled node type: " + node.getClass().getName());
        }
+    }
+    
+    /**
+     * OAI requires second-level precision at most, but Fedora provides 
+     * millisecond precision.
+     * Fedora only uses UTC dates, so ensure UTC dates are indicated with a 
+     * trailing 'Z'.
+     * @param datetime
+     * @return datetime string such as 2004-01-31T23:11:00Z
+     */
+    private String formatDatetime(String datetime) {
+        StringBuffer sb = new StringBuffer(datetime);
+        // length() - 5 b/c at most we're dealing with ".SSSZ"
+        int i = sb.indexOf(".", sb.length() - 5);
+        if (i != -1) {
+            sb.delete(i, sb.length());
+        }
+        // Kowari's XSD.Datetime isn't timezone aware
+        if (sb.charAt(sb.length() - 1) != 'Z') {
+            sb.append('Z');
+        }
+        return sb.toString();
     }
     
 }

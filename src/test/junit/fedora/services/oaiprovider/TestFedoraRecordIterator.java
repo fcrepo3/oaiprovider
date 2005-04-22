@@ -24,4 +24,8 @@ public class TestFedoraRecordIterator extends TestCase {
         }
         
     }
+    
+    public void testDate() throws Exception {
+        
+    }
 }
