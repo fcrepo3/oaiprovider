@@ -89,13 +89,20 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         }
         
         // From and until dates are optional
+        // OAI from/until dates are inclusive boundaries.
+        // ITQL before/after are exclusive
         // TODO: check inclusive/exclusive
         if (from != null) {
+            // decrement date by 1 millisecond
+            from.setTime(from.getTime() - 1);
+            
             query.append("and $date <" + TUCANA.AFTER + "> '" + 
                          DateUtility.convertDateToString(from) + 
                          "' in <#xsd>\n ");
         }
         if (until != null) {
+            // increment date by 1 millisecond
+            until.setTime(until.getTime() + 1);
             query.append("and $date <" + TUCANA.BEFORE + "> '" + 
                          DateUtility.convertDateToString(until) + 
                          "' in <#xsd>\n ");
