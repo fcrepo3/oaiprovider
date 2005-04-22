@@ -1,10 +1,7 @@
 package fedora.services.oaiprovider;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
-
-import fedora.services.oaiprovider.ITQLQueryFactory;
 
 import junit.framework.TestCase;
 

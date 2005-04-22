@@ -41,7 +41,7 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_FORMAT_LOC_END        = ".loc";
     public static final String PROP_FORMAT_URI_END        = ".uri";
     public static final String PROP_FORMAT_DISSTYPE_END   = ".dissType";
-    public static final String PROP_FORMAT_ABOUT_END      = "about.dissType";
+    public static final String PROP_FORMAT_ABOUT_END      = ".about.dissType";
     public static final String PROP_ITEM_SETSPEC_PATH     = NS + "itemSetSpecPath";
     
 
@@ -194,7 +194,7 @@ public class FedoraOAIDriver implements OAIDriver {
             namespaceURI   = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_URI_END);
             schemaLocation = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_LOC_END);
             dissType       = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_DISSTYPE_END);
-            about          = getRequired(props, PROP_FORMAT_START + prefix + PROP_FORMAT_ABOUT_END);
+            about          = getOptional(props, PROP_FORMAT_START + prefix + PROP_FORMAT_ABOUT_END);
             
             String otherPrefix = props.getProperty(PROP_FORMAT_START + prefix + PROP_FORMAT_PFX_END);
             if (otherPrefix != null) prefix = otherPrefix;

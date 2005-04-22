@@ -7,13 +7,14 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import proai.Record;
+import proai.Writable;
 import proai.error.RepositoryException;
 import proai.error.ServerException;
 
 /**
  * @author Edwin Shin
  */
-public class FedoraRecord implements Record {
+public class FedoraRecord implements Record, Writable {
     private FedoraClient m_fedora;
     private String m_itemID;
     private String m_recordDiss;
