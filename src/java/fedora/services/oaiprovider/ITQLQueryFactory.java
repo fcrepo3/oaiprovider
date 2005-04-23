@@ -64,6 +64,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, 
                                 String mdPrefixAboutDissType, 
                                 boolean withContent) {
+        boolean custom_delete = !(m_deleted == null || m_deleted.equals(""));
         boolean set = !m_setSpec.equals("");
         boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
         String setSpec = set ? "$setSpec" : "";
@@ -82,7 +83,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         // to dissemination-level) property. If present, use it in place of
         // Fedora state.
         // TODO: configurable values for deleted, when property is user-defined?
-        if (m_deleted.equals("")) {
+        if (!custom_delete) {
             query.append("and $recordDiss <" + MODEL.STATE + "> $deleted\n ");
         } else {
             query.append("and $item <" + m_deleted + "> $deleted\n ");
@@ -91,7 +92,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         // From and until dates are optional
         // OAI from/until dates are inclusive boundaries.
         // ITQL before/after are exclusive
-        // TODO: check inclusive/exclusive
         if (from != null) {
             // decrement date by 1 millisecond
             from.setTime(from.getTime() - 1);

@@ -145,7 +145,7 @@ public class FedoraOAIDriver implements OAIDriver {
         try {
             tuples = m_fedora.getTuples(m_queryFactory.setInfoQuery());
         } catch (IOException e) {
-            throw new RepositoryException("Error getting tuples from Fedora", e);
+            throw new RepositoryException("Error getting tuples from Fedora: " + e.getMessage(), e);
         }
         return new FedoraSetInfoIterator(m_fedora, tuples);
     }
