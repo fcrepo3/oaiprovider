@@ -249,15 +249,29 @@ public class FedoraOAIDriver implements OAIDriver {
 
     private Date parseDate(String dateString) throws RepositoryException {
         DateFormat formatter = null;
-        if (dateString.length() == 19) {
-            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        } else if (dateString.length() == 20) {
-            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        } else if (dateString.length() == 23) {
-            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        } else if (dateString.length() == 24) {
-            formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        
+        if (dateString.endsWith("Z")) {
+            if (dateString.length() == 20) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            } else if (dateString.length() == 22) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+            } else if (dateString.length() == 23) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
+            } else if (dateString.length() == 24) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            }
+        } else {
+            if (dateString.length() == 19) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            } else if (dateString.length() == 21) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
+            } else if (dateString.length() == 22) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
+            } else if (dateString.length() == 23) {
+                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+            }
         }
+        
         try {
             return formatter.parse(dateString);
         } catch (Exception e) {
