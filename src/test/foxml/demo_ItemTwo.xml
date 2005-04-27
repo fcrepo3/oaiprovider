@@ -5,9 +5,11 @@
     <foxml:property NAME="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" VALUE="FedoraObject"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
     <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Item Two"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2002-02-02T00:00:00Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2002-12-02T00:00:00Z"/>
   </foxml:objectProperties>
   <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="RELS-EXT.0" LABEL="Relationships"
+    <foxml:datastreamVersion ID="RELS-EXT.0" CREATED="2002-02-02T00:00:00Z" LABEL="Relationships"
       MIMETYPE="text/xml">
       <foxml:xmlContent>
         <rdf:RDF xmlns:oai="http://www.openarchives.org/OAI/2.0/"
@@ -21,7 +23,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Metadata"
+    <foxml:datastreamVersion ID="DC1.0" CREATED="2002-02-02T00:00:00Z" LABEL="Dublin Core Metadata"
       MIMETYPE="text/xml">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
@@ -32,7 +34,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X" ID="test_format" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="test_format.0" LABEL="test_format"
+    <foxml:datastreamVersion ID="test_format.0" CREATED="2002-02-02T00:00:00Z" LABEL="test_format"
       MIMETYPE="text/xml">
       <foxml:xmlContent>
         <test_format:doc xmlns:test_format="http://example.org/test_format/"
@@ -43,7 +45,7 @@
     </foxml:datastreamVersion>
   </foxml:datastream>
   <foxml:datastream CONTROL_GROUP="X" ID="oai_dc" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="oai_dc.0" LABEL="oai_dc" MIMETYPE="text/xml">
+    <foxml:datastreamVersion ID="oai_dc.0" CREATED="2002-02-02T00:00:00Z" LABEL="oai_dc" MIMETYPE="text/xml">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
