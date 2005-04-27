@@ -44,7 +44,9 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_FORMAT_ABOUT_END      = ".about.dissType";
     public static final String PROP_ITEM_SETSPEC_PATH     = NS + "itemSetSpecPath";
     
-
+    protected static final int OPTIONAL_FIELD_SETSPEC     = 1 << 0;  //  1
+    protected static final int OPTIONAL_FIELD_ABOUT       = 1 << 1;  //  2 
+    
     private QueryFactory m_queryFactory;
     private URL m_identify;
     private String m_fedoraBaseURL;
@@ -73,6 +75,7 @@ public class FedoraOAIDriver implements OAIDriver {
         if (!m_fedoraBaseURL.endsWith("/")) m_fedoraBaseURL += "/";
         m_fedoraUser      = getRequired(props, PROP_USER); 
         m_fedoraPass      = getRequired(props, PROP_PASS); 
+        m_setSpec         = getOptional(props, FedoraOAIDriver.PROP_SETSPEC);
 
         m_metadataFormats = getMetadataFormats(props);
 
@@ -167,7 +170,16 @@ public class FedoraOAIDriver implements OAIDriver {
         } catch (IOException e) {
             throw new RepositoryException("Error getting tuples from Fedora", e);
         }
-        return new FedoraRecordIterator(m_fedora, tuples);
+        
+        // setSpec and aboutDissType are optional query fields
+        int optionalFields = 0;
+        if (!m_setSpec.equals("")) {
+            optionalFields |= OPTIONAL_FIELD_SETSPEC;
+        }
+        if (mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("")) {
+            optionalFields |= OPTIONAL_FIELD_ABOUT;
+        }
+        return new FedoraRecordIterator(m_fedora, tuples, optionalFields);
     }
 
     public void close() throws RepositoryException {

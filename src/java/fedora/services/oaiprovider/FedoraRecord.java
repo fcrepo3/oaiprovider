@@ -114,7 +114,7 @@ public class FedoraRecord implements Record, Writable {
             if (i == -1) throw new RepositoryException("Bad abouts xml: closing " + aboutWrapperEnd + " not found");
             out.print(xml.substring(0, i));
         } catch (IOException e) {
-            throw new RepositoryException("IO error reading " + m_aboutDiss, e);
+            throw new RepositoryException("IO error reading aboutDiss " + m_aboutDiss, e);
         } finally {
             if (in != null) try { in.close(); } catch (IOException e) { }
         }

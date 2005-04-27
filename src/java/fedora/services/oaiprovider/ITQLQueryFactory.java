@@ -124,7 +124,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         query.append("order by $itemID asc ");
         
         Map map = new HashMap();
-        map.put("lang", "itql");
+        map.put("lang", QUERY_LANGUAGE);
         map.put("query", query.toString());
         return map;
     }
