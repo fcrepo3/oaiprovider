@@ -43,8 +43,8 @@
       </foxml:xmlContent>
     </foxml:datastreamVersion>
   </foxml:datastream>
-  <foxml:datastream CONTROL_GROUP="X" ID="oai_dc" CREATED="2001-01-01T00:00:00Z" STATE="A" VERSIONABLE="true">
-    <foxml:datastreamVersion ID="oai_dc.0" LABEL="oai_dc" MIMETYPE="text/xml">
+  <foxml:datastream CONTROL_GROUP="X" ID="oai_dc" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="oai_dc.0" CREATED="2001-01-01T00:00:00Z" LABEL="oai_dc" MIMETYPE="text/xml">
       <foxml:xmlContent>
         <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
           xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
