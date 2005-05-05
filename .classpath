@@ -21,9 +21,9 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry sourcepath="ECLIPSE_HOME/plugins/org.eclipse.jdt.source_3.0.0/src/org.junit_3.8.1/junitsrc.zip" kind="var" path="JUNIT_HOME/junit.jar"/>
 	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/trippi-0.9.1.jar"/>
 	<classpathentry kind="lib" path="lib/xmlpull_1_1_3_4a.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3_min-1.1.3.4.K.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector.jar"/>
+	<classpathentry kind="lib" path="lib/trippi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
