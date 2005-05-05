@@ -28,7 +28,6 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
         Logger.getLogger(FedoraOAIDriver.class.getName());
     private FedoraClient m_fedora;
     private TupleIterator m_tuples;
-    private int m_optionalFields;
 
     private Record m_next;
     
@@ -42,10 +41,9 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
      * itemID   recordDiss   date   deleted   setSpec   aboutDiss
      * </pre>
      */
-    public FedoraRecordIterator(FedoraClient fedora, TupleIterator tuples, int optionalFields) {
+    public FedoraRecordIterator(FedoraClient fedora, TupleIterator tuples) {
         m_fedora = fedora;
         m_tuples = tuples;
-        m_optionalFields = optionalFields;
         
         m_nextGroup = new ArrayList();
         m_next = getNext();
@@ -100,16 +98,7 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
             boolean isDeleted = false;
             Set sets = new HashSet();
             String aboutDiss = null;
-            
             String[] values;
-            
-            // which optional fields are present?
-            boolean hasSetSpec = (m_optionalFields & FedoraOAIDriver.OPTIONAL_FIELD_SETSPEC) == FedoraOAIDriver.OPTIONAL_FIELD_SETSPEC;
-            boolean hasAboutDiss = (m_optionalFields & FedoraOAIDriver.OPTIONAL_FIELD_ABOUT) == FedoraOAIDriver.OPTIONAL_FIELD_ABOUT;
-            int setIndex = 4, aboutIndex = 5;
-            if (!hasSetSpec) {
-                aboutIndex--;
-            }
             while (it.hasNext() && !isDeleted) {
                 values = (String[])it.next();
                 if (itemID == null) itemID = values[0];
@@ -120,16 +109,12 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
                 isDeleted = !values[3].equals(MODEL.ACTIVE.uri);
                 
                 // sets and about are optional
-                if (hasSetSpec) {
-                    if (values[setIndex] != null && !values[setIndex].equals("")) {
-                        sets.add(values[setIndex]);
-                    }
+                if (values[4] != null && !values[4].equals("")) {
+                        sets.add(values[4]);
                 }
                 
-                if (hasAboutDiss) {
-                    if (aboutDiss == null && values[aboutIndex] != null && !values[aboutIndex].equals("")) {
-                        aboutDiss = values[aboutIndex];
-                    }
+                if (aboutDiss == null && values[5] != null && !values[5].equals("")) {
+                    aboutDiss = values[5];
                 }
             }
             String[] setSpecs = new String[sets.size()];

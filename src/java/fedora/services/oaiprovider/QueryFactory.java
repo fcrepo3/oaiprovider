@@ -1,16 +1,19 @@
 package fedora.services.oaiprovider;
 
-import java.util.*;
-import proai.error.*;
+import java.util.Date;
+import java.util.Properties;
+
+import proai.driver.RemoteIterator;
+import proai.error.RepositoryException;
 
 public interface QueryFactory {
 
-    public void init(Properties props) throws RepositoryException;
+    public void init(FedoraClient client, Properties props) throws RepositoryException;
 
-    public Map latestRecordDateQuery();
-
-    public Map setInfoQuery();
+    public Date latestRecordDate();
     
-    public Map listRecordsQuery(Date from, Date until, String mdPrefixDissType, String mdPrefixAboutDissType, boolean withContent);
+    public RemoteIterator listSetInfo();
+    
+    public RemoteIterator listRecords(Date from, Date until, String mdPrefixDissType, String mdPrefixAboutDissType, boolean withContent);
 
 }

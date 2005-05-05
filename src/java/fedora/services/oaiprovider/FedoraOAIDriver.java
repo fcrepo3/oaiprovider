@@ -1,17 +1,23 @@
 package fedora.services.oaiprovider;
 
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
-import org.apache.log4j.*;
-import org.jrdf.graph.Literal;
-import org.trippi.*;
+import org.apache.log4j.Logger;
 
-import proai.driver.impl.*;
-import proai.driver.*;
-import proai.error.*;
+import proai.driver.OAIDriver;
+import proai.driver.RemoteIterator;
+import proai.driver.impl.RemoteIteratorImpl;
+import proai.error.RepositoryException;
 
 /**
  * Implementation of the OAIDriver interface for Fedora.
@@ -89,18 +95,20 @@ public class FedoraOAIDriver implements OAIDriver {
 
         String className = getRequired(props, PROP_QUERY_FACTORY);
         try {
-            Class queryFactoryClass = Class.forName(className);
-            m_queryFactory = (QueryFactory) queryFactoryClass.newInstance();
-            m_queryFactory.init(props);
-        } catch (Exception e) {
-            throw new RepositoryException("Unable to initialize " + className, e);
-        }
-
-        try {
             m_fedora = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
         } catch (Exception e) {
             throw new RepositoryException("Error parsing baseURL", e);
         }
+        
+        try {
+            Class queryFactoryClass = Class.forName(className);
+            m_queryFactory = (QueryFactory) queryFactoryClass.newInstance();
+            m_queryFactory.init(m_fedora, props);
+        } catch (Exception e) {
+            throw new RepositoryException("Unable to initialize " + className, e);
+        }
+
+        
     }
 
     public void write(PrintWriter out) throws RepositoryException {
@@ -118,25 +126,7 @@ public class FedoraOAIDriver implements OAIDriver {
 
     // TODO: date for volatile disseminations?
     public Date getLatestDate() throws RepositoryException {
-        Map parms = m_queryFactory.latestRecordDateQuery();
-        TupleIterator tuples = null;
-        try {
-            tuples = m_fedora.getTuples(parms);
-            if (tuples.hasNext()) {
-                Literal dateLiteral = (Literal) tuples.next().get("date");
-                if (dateLiteral == null) {
-                    throw new RepositoryException("A row was returned, but it did not contain a 'date' binding");
-                }
-                return parseDate(dateLiteral.getLexicalForm());
-            } else {
-                // no tuples... what to do?
-                throw new RepositoryException("No rows returned from query");
-            }
-        } catch (Exception e) {
-            throw new RepositoryException("Error querying for latest changed record date", e);
-        } finally {
-            if (tuples != null) try { tuples.close(); } catch (Exception e) { }
-        }
+        return m_queryFactory.latestRecordDate();
     }
 
     public RemoteIterator listMetadataFormats() throws RepositoryException {
@@ -144,13 +134,7 @@ public class FedoraOAIDriver implements OAIDriver {
     }
 
     public RemoteIterator listSetInfo() throws RepositoryException {
-        TupleIterator tuples = null;
-        try {
-            tuples = m_fedora.getTuples(m_queryFactory.setInfoQuery());
-        } catch (IOException e) {
-            throw new RepositoryException("Error getting tuples from Fedora: " + e.getMessage(), e);
-        }
-        return new FedoraSetInfoIterator(m_fedora, tuples);
+        return m_queryFactory.listSetInfo();
     }
 
     public RemoteIterator listRecords(Date from, 
@@ -162,24 +146,7 @@ public class FedoraOAIDriver implements OAIDriver {
         }
         String mdPrefixDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getDissType();
         String mdPrefixAboutDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getAbout();
-        Map map = m_queryFactory.listRecordsQuery(from, until, mdPrefixDissType, mdPrefixAboutDissType, withContent);
-        logger.info("listRecords() query:\n" + map.get("query"));
-        TupleIterator tuples = null;
-        try {
-            tuples = m_fedora.getTuples(map);
-        } catch (IOException e) {
-            throw new RepositoryException("Error getting tuples from Fedora", e);
-        }
-        
-        // setSpec and aboutDissType are optional query fields
-        int optionalFields = 0;
-        if (!m_setSpec.equals("")) {
-            optionalFields |= OPTIONAL_FIELD_SETSPEC;
-        }
-        if (mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("")) {
-            optionalFields |= OPTIONAL_FIELD_ABOUT;
-        }
-        return new FedoraRecordIterator(m_fedora, tuples, optionalFields);
+        return m_queryFactory.listRecords(from, until, mdPrefixDissType, mdPrefixAboutDissType, withContent);
     }
 
     public void close() throws RepositoryException {
@@ -258,37 +225,4 @@ public class FedoraOAIDriver implements OAIDriver {
             if (reader != null) try { reader.close(); } catch (Exception e) { }
         }
     }
-
-    private Date parseDate(String dateString) throws RepositoryException {
-        DateFormat formatter = null;
-        
-        if (dateString.endsWith("Z")) {
-            if (dateString.length() == 20) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            } else if (dateString.length() == 22) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-            } else if (dateString.length() == 23) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
-            } else if (dateString.length() == 24) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            }
-        } else {
-            if (dateString.length() == 19) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            } else if (dateString.length() == 21) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
-            } else if (dateString.length() == 22) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
-            } else if (dateString.length() == 23) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            }
-        }
-        
-        try {
-            return formatter.parse(dateString);
-        } catch (Exception e) {
-            throw new RepositoryException("Could not parse date: " + dateString);
-        }
-    }
-
 }
