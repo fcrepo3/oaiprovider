@@ -23,12 +23,13 @@ public class TestITQLQueryFactory extends TestCase {
         props.put(FedoraOAIDriver.PROP_SETSPEC_NAME, "http://www.openarchives.org/OAI/2.0/setName");
         props.put(FedoraOAIDriver.PROP_ITEM_SETSPEC_PATH, "$item <fedora-rels-ext:isMemberOf> $set $set <http://www.openarchives.org/OAI/2.0/setSpec> $setSpec");
         
-        QueryFactory qf = new ITQLQueryFactory();
-        qf.init(props);
+        ITQLQueryFactory iqf = new ITQLQueryFactory();
+        QueryFactory qf = (QueryFactory)iqf;
+        qf.init(null, props);
         
         Date df = new Date(0L);
         Date du = new Date(1114185883000L);
-        Map map = qf.listRecordsQuery(df, du, "info:fedora/*/oai_dc", "info:fedora/*/about_oai_dc", true);
+        Map map = iqf.getListRecordsQuery(df, du, "info:fedora/*/oai_dc", "info:fedora/*/about_oai_dc", true);
         System.out.println((String)map.get("query"));
     }
 
