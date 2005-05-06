@@ -49,35 +49,9 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     /**
      * Returns the date of the latest record in the repository.
      * 
-     * Uses a query similar to the following: 
-     * <pre>
- select $date
- from &lt;#ri&gt;
- where $object &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $oaiItemID
-   and $object &lt;fedora-view:disseminates&gt; $diss
-   and $diss &lt;fedora-view:lastModifiedDate&gt; $date
-   order by $date desc
-   limit 1
-     * </pre>
      */
     public Date latestRecordDate() {
-        String query = "select $date\n" +
-                       "from <#ri>\n" +
-                       "  subquery(\n" +
-                       "    select $volatile\n" +
-                       "    from <$ri>\n" +
-                       "    where $x0 <" + m_oaiItemID + "> $x1\n" +
-                       "      and $x1 <" + VIEW.DISSEMINATES.uri + "> $x2\n" +
-                       "      and $x2 <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
-                       "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
-                       "  )\n" +
-                       "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
-                       "and $object <" + VIEW.DISSEMINATES.uri + "> $diss\n" +
-                       "and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
-                       "order by $date desc\n" +
-                       "limit 1";
-
-        TupleIterator tuples = getTuples(query);
+        TupleIterator tuples = getTuples(getLatestRecordDateQuery());
         try {
             if (tuples.hasNext()) {
                 Map row = tuples.next();
@@ -127,6 +101,40 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                                              mdPrefixAboutDissType, withContent);
         TupleIterator tuples = getTuples(query);
         return new FedoraRecordIterator(m_fedora, tuples);
+    }
+    
+    /**
+     * Builds the iTQL query for latest record date.
+     * 
+     * Uses a query similar to the following: 
+     * <pre>
+ select $date
+ from &lt;#ri&gt;
+ where $object &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $oaiItemID
+   and $object &lt;fedora-view:disseminates&gt; $diss
+   and $diss &lt;fedora-view:lastModifiedDate&gt; $date
+   order by $date desc
+   limit 1
+     * </pre>
+     * @return the iTQL query for latestRecordDate
+     */
+    protected String getLatestRecordDateQuery() {
+        String query = "select $date\n" +
+                       "  subquery(\n" +
+                       "    select $volatile\n" +
+                       "    from <#ri>\n" +
+                       "    where $x <" + m_oaiItemID + "> $y\n" +
+                       "      and $x <" + VIEW.DISSEMINATES.uri + "> $z\n" +
+                       "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
+                       "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
+                       "  )\n" +
+                       "from <#ri>\n" +
+                       "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
+                       "  and $object <" + VIEW.DISSEMINATES.uri + "> $diss\n" +
+                       "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
+                       "  order by $date desc\n" +
+                       "  limit 1\n";
+        return query;
     }
     
     /**
@@ -214,7 +222,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         // FedoraOAIDriver.PROP_DELETED is an optional, object-level (as opposed
         // to dissemination-level) property. If present, use it in place of
         // Fedora state.
-        if (!m_deleted.equals("")) {
+        if (m_deleted.equals("")) {
             query.append("  and $recordDiss <" + MODEL.STATE + "> $deleted\n ");
         } else {
             query.append("  and $item <" + m_deleted + "> $deleted\n ");
@@ -227,19 +235,19 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
             // decrement date by 1 millisecond
             from.setTime(from.getTime() - 1);
             
-            query.append("  and $date <" + TUCANA.AFTER + "> '" + 
+            query.append(" and $date <" + TUCANA.AFTER + "> '" + 
                          DateUtility.convertDateToString(from) + 
                          "' in <#xsd>\n ");
         }
         if (until != null) {
             // increment date by 1 millisecond
             until.setTime(until.getTime() + 1);
-            query.append("  and $date <" + TUCANA.BEFORE + "> '" + 
+            query.append(" and $date <" + TUCANA.BEFORE + "> '" + 
                          DateUtility.convertDateToString(until) + 
                          "' in <#xsd>\n ");
         }
         
-        query.append("  order by $itemID asc");
+        query.append(" order by $itemID asc");
         return query.toString();
     }
     
