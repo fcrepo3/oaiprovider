@@ -1,12 +1,21 @@
 package fedora.services.oaiprovider;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.*;
-import org.trippi.*;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.trippi.RDFFormat;
+import org.trippi.TrippiException;
+import org.trippi.TupleIterator;
 
 public class FedoraClient {
 

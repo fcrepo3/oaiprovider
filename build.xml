@@ -80,6 +80,7 @@
            sourcepath="src/java"
            defaultexcludes="yes"
            destdir="dist/doc/api"
+           use="true"
            windowtitle="Fedora OAI Provider Javadocs">
       <doctitle><![CDATA[<h1>Fedora OAI Provider Javadocs Javadocs</h1>]]></doctitle>
     </javadoc>

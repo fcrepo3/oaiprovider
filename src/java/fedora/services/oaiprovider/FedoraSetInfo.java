@@ -1,9 +1,13 @@
 package fedora.services.oaiprovider;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
-import proai.*;
-import proai.error.*;
+import proai.SetInfo;
+import proai.error.RepositoryException;
 
 /**
  * SetInfo impl that includes setDescription elements for

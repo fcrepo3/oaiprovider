@@ -1,13 +1,11 @@
 package fedora.services.oaiprovider;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Map;
-
-import fedora.common.Constants;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jrdf.graph.Literal;
@@ -19,6 +17,7 @@ import org.trippi.TupleIterator;
 import proai.Record;
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
+import fedora.common.Constants;
 
 /**
  * @author Edwin Shin

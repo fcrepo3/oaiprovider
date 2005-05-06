@@ -1,8 +1,12 @@
 package fedora.services.oaiprovider;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpMethod;
 
 /**
  * An InputStream from an HttpMethod.

@@ -1,16 +1,19 @@
 package fedora.services.oaiprovider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.Node;
 import org.jrdf.graph.URIReference;
-import org.trippi.*;
+import org.trippi.TrippiException;
+import org.trippi.TupleIterator;
 
-import proai.*;
-import proai.driver.*;
-import proai.error.*;
+import proai.SetInfo;
+import proai.driver.RemoteIterator;
+import proai.error.RepositoryException;
 
 public class FedoraSetInfoIterator implements RemoteIterator {
 

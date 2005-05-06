@@ -31,27 +31,25 @@ public class FedoraOAIDriver implements OAIDriver {
 
     public static final String NS = "driver.fedora.";
 
-    public static final String PROP_BASEURL          = NS + "baseURL";
-    public static final String PROP_USER             = NS + "user";
-    public static final String PROP_PASS             = NS + "pass";
-    public static final String PROP_IDENTIFY         = NS + "identify";
-    public static final String PROP_ITEMID           = NS + "itemID";
-    public static final String PROP_SETSPEC          = NS + "setSpec";
-    public static final String PROP_SETSPEC_NAME     = NS + "setSpec.name";
+    public static final String PROP_BASEURL               = NS + "baseURL";
+    public static final String PROP_USER                  = NS + "user";
+    public static final String PROP_PASS                  = NS + "pass";
+    public static final String PROP_IDENTIFY              = NS + "identify";
+    public static final String PROP_ITEMID                = NS + "itemID";
+    public static final String PROP_SETSPEC               = NS + "setSpec";
+    public static final String PROP_SETSPEC_NAME          = NS + "setSpec.name";
     public static final String PROP_SETSPEC_DESC_DISSTYPE = NS + "setSpec.desc.dissType";
-    public static final String PROP_QUERY_FACTORY    = NS + "queryFactory";
-    public static final String PROP_FORMATS          = NS + "md.formats";
-    public static final String PROP_FORMAT_START     = NS + "md.format.";
-    public static final String PROP_DELETED          = NS + "deleted";
+    public static final String PROP_QUERY_FACTORY         = NS + "queryFactory";
+    public static final String PROP_FORMATS               = NS + "md.formats";
+    public static final String PROP_FORMAT_START          = NS + "md.format.";
+    public static final String PROP_DELETED               = NS + "deleted";
     public static final String PROP_FORMAT_PFX_END        = ".mdPrefix";
     public static final String PROP_FORMAT_LOC_END        = ".loc";
     public static final String PROP_FORMAT_URI_END        = ".uri";
     public static final String PROP_FORMAT_DISSTYPE_END   = ".dissType";
     public static final String PROP_FORMAT_ABOUT_END      = ".about.dissType";
     public static final String PROP_ITEM_SETSPEC_PATH     = NS + "itemSetSpecPath";
-    
-    protected static final int OPTIONAL_FIELD_SETSPEC     = 1 << 0;  //  1
-    protected static final int OPTIONAL_FIELD_ABOUT       = 1 << 1;  //  2 
+    public static final String PROP_VOLATILE              = NS + "volatile";
     
     private QueryFactory m_queryFactory;
     private URL m_identify;
@@ -68,8 +66,7 @@ public class FedoraOAIDriver implements OAIDriver {
 
     private FedoraClient m_fedora;
     
-    public FedoraOAIDriver() {
-    }
+    public FedoraOAIDriver() {}
     
     //////////////////////////////////////////////////////////////////////////
     ///////////////////// Methods from proai.driver.OAIDriver ////////////////
@@ -198,6 +195,12 @@ public class FedoraOAIDriver implements OAIDriver {
         }
     }
     
+    /**
+     * 
+     * @param props
+     * @param key
+     * @return the value associated with key or the empty String ("")
+     */
     protected static String getOptional(Properties props, String key) {
         String val = props.getProperty(key);
         logger.debug(key + " = " + val);

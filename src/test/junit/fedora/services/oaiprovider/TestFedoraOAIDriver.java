@@ -73,6 +73,17 @@ public class TestFedoraOAIDriver extends TestCase {
 
     }
 
+    public void testGetOptional() {
+        Properties p = new Properties();
+        String key = "foo";
+        String value = "bar";
+        p.put(key, value);
+
+        assertEquals(value, FedoraOAIDriver.getOptional(p, key));
+        assertEquals("", FedoraOAIDriver.getOptional(p, value));
+        
+    }
+    
     public void tearDown() {
     }
 }
