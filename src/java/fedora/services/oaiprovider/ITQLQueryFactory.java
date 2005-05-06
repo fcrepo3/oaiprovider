@@ -1,8 +1,6 @@
 package fedora.services.oaiprovider;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +61,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                     if (dateLiteral == null) {
                         throw new RepositoryException("A row was returned, but it did not contain a 'date' binding");
                     }
-                    return parseDate(dateLiteral.getLexicalForm());
+                    return DateUtility.parseDateAsUTC(dateLiteral.getLexicalForm());
                 }
             } else {
                 // no tuples... what to do?
@@ -194,7 +192,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
             // we don't want to match anything
             query.append("      $setSpec <test:noMatch> <test:noMatch>\n");
         }
-        query.append(")\n");
+        query.append("  )\n");
         
         query.append("  subquery(\n" +
                      "    select $aboutDiss\n" +
@@ -223,9 +221,9 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         // to dissemination-level) property. If present, use it in place of
         // Fedora state.
         if (m_deleted.equals("")) {
-            query.append("  and $recordDiss <" + MODEL.STATE + "> $deleted\n ");
+            query.append("  and $recordDiss <" + MODEL.STATE + "> $deleted\n");
         } else {
-            query.append("  and $item <" + m_deleted + "> $deleted\n ");
+            query.append("  and $item <" + m_deleted + "> $deleted\n");
         }     
         
         // From and until dates are optional
@@ -235,19 +233,19 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
             // decrement date by 1 millisecond
             from.setTime(from.getTime() - 1);
             
-            query.append(" and $date <" + TUCANA.AFTER + "> '" + 
+            query.append("  and $date <" + TUCANA.AFTER + "> '" + 
                          DateUtility.convertDateToString(from) + 
-                         "' in <#xsd>\n ");
+                         "' in <#xsd>\n");
         }
         if (until != null) {
             // increment date by 1 millisecond
             until.setTime(until.getTime() + 1);
-            query.append(" and $date <" + TUCANA.BEFORE + "> '" + 
+            query.append("  and $date <" + TUCANA.BEFORE + "> '" + 
                          DateUtility.convertDateToString(until) + 
-                         "' in <#xsd>\n ");
+                         "' in <#xsd>\n");
         }
         
-        query.append(" order by $itemID asc");
+        query.append("  order by $itemID asc\n");
         return query.toString();
     }
     
@@ -263,45 +261,13 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         }
     }
 
-    private Date parseDate(String dateString) throws RepositoryException {
-        DateFormat formatter = null;
-        
-        if (dateString.endsWith("Z")) {
-            if (dateString.length() == 20) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            } else if (dateString.length() == 22) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-            } else if (dateString.length() == 23) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS'Z'");
-            } else if (dateString.length() == 24) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            }
-        } else {
-            if (dateString.length() == 19) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            } else if (dateString.length() == 21) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
-            } else if (dateString.length() == 22) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS");
-            } else if (dateString.length() == 23) {
-                formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            }
-        }
-        
-        try {
-            return formatter.parse(dateString);
-        } catch (Exception e) {
-            throw new RepositoryException("Could not parse date: " + dateString);
-        }
-    }
-
     /**
      * 
      * @param itemSetSpecPath
      * @return the setSpec, in the form "$item <$predicate> $setSpec"
      * @throws RepositoryException
      */
-    private String parseItemSetSpecPath(String itemSetSpecPath) throws RepositoryException {
+    protected String parseItemSetSpecPath(String itemSetSpecPath) throws RepositoryException {
         String msg = "Required property, itemSetSpecPath, ";
         String[] path = itemSetSpecPath.split("\\s+");
         if (itemSetSpecPath.indexOf("$item") == -1) {
