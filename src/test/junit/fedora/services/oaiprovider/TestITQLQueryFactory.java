@@ -105,8 +105,12 @@ public class TestITQLQueryFactory extends TestCase {
                      iqf.parseItemSetSpecPath(ssp));
         
         String[] badSetPaths = {"foo",
-                                "$item",
-                                "$item <urn:foo> $set $set <urn:bar>"
+                                "$item <predicate:foo> $set",
+                                "$foo <predicate:bar> $setSpec",
+                                "$item $predicate $setSpec",
+                                "$item <urn:foo> $set and $set <urn:bar> $setSpec",
+                                "$item <urn:foo> $set $set <urn:bar>",
+                                "$item urn:baz $setSpec"
         };
         
         for (int i = 0; i < badSetPaths.length; i++) {
