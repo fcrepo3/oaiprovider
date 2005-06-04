@@ -80,15 +80,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
 
     public RemoteIterator listSetInfo() {
-        String query = "select $setSpec $setName $setDiss\n" +
-                       "from <#ri>\n" +
-                       "where $set <" + m_setSpec + "> $setSpec\n" +
-                       "and $set <" + m_setSpecName + "> $setName\n" +
-                       "and ($set <" + m_setSpecName + "> $anything\n" +
-                       "    or ($set <" + VIEW.DISSEMINATES.uri + "> $setDiss\n" +
-                       "        and $setDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + m_setSpecDescDissType + ">))";
-
-        TupleIterator tuples = getTuples(query);
+        TupleIterator tuples = getTuples(getListSetInfoQuery());
         return new FedoraSetInfoIterator(m_fedora, tuples);
     }
     
@@ -249,10 +241,35 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         return query.toString();
     }
     
+    protected String getListSetInfoQuery() {
+        boolean setDesc = m_setSpecDescDissType != null && !m_setSpecDescDissType.equals("");
+        StringBuffer query = new StringBuffer();
+        query.append("select $setSpec $setName\n" +
+        		     "  subquery(" +
+        		     "    select $setDiss\n" +
+        		     "	  from <#ri>\n" +
+        		     "      where\n");
+        if (setDesc) {
+            query.append("      $set <" + m_setSpec + "> $setSpec\n" +
+                         "      and $set <" + m_setSpecName + "> $setName\n" +
+	        		     "      and $set <" + VIEW.DISSEMINATES.uri + "> $setDiss\n" +
+	        		     "      and $setDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + m_setSpecDescDissType + ">");
+        } else {
+            // we don't want to match anything
+            query.append("      $setDiss <test:noMatch> <test:noMatch>\n");
+        }
+        query.append(")\n");
+        query.append("from <#ri>" +
+        		     "where $set <" + m_setSpec + "> $setSpec\n" +
+                     "and $set <" + m_setSpecName + "> $setName");
+        return query.toString();
+    }
+    
     private TupleIterator getTuples(String query) throws RepositoryException {
         Map parameters = new HashMap();
         parameters.put("lang", QUERY_LANGUAGE);
         parameters.put("query", query);
+        
         try {
             return m_fedora.getTuples(parameters);
         } catch (IOException e) {
