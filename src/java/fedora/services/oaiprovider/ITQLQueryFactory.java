@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.jrdf.graph.Literal;
 import org.trippi.TupleIterator;
 
@@ -17,7 +18,9 @@ import fedora.server.utilities.DateUtility;
 public class ITQLQueryFactory implements QueryFactory, Constants {
 
     private static final String QUERY_LANGUAGE = "itql";
-
+    private static final Logger logger =
+        Logger.getLogger(FedoraOAIDriver.class.getName());
+    
     private String m_oaiItemID;
     private String m_setSpec;
     private String m_setSpecName;
@@ -266,6 +269,8 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
     }
     
     private TupleIterator getTuples(String query) throws RepositoryException {
+    	logger.debug("getTuples() called with query: ");
+    	logger.debug(query);
         Map parameters = new HashMap();
         parameters.put("lang", QUERY_LANGUAGE);
         parameters.put("query", query);

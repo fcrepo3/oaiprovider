@@ -56,14 +56,7 @@ public class FedoraOAIDriver implements OAIDriver {
     private String m_fedoraBaseURL;
     private String m_fedoraUser;
     private String m_fedoraPass;
-    private String m_itemID;
-    private String m_itemSetPath;
-    private String m_setSpec;
-    private String m_setSpecName;
-    private String m_setSpecDissType;
-    
     private Map m_metadataFormats;
-
     private FedoraClient m_fedora;
     
     public FedoraOAIDriver() {}
@@ -78,8 +71,6 @@ public class FedoraOAIDriver implements OAIDriver {
         if (!m_fedoraBaseURL.endsWith("/")) m_fedoraBaseURL += "/";
         m_fedoraUser      = getRequired(props, PROP_USER); 
         m_fedoraPass      = getRequired(props, PROP_PASS); 
-        m_setSpec         = getOptional(props, FedoraOAIDriver.PROP_SETSPEC);
-
         m_metadataFormats = getMetadataFormats(props);
 
         try {
@@ -104,8 +95,6 @@ public class FedoraOAIDriver implements OAIDriver {
         } catch (Exception e) {
             throw new RepositoryException("Unable to initialize " + className, e);
         }
-
-        
     }
 
     public void write(PrintWriter out) throws RepositoryException {
@@ -189,10 +178,9 @@ public class FedoraOAIDriver implements OAIDriver {
         String val = props.getProperty(key);
         if (val == null) {
             throw new RepositoryException("Required property is not set: " + key);
-        } else {
-            logger.debug(key + " = " + val);
-            return val.trim();
         }
+        logger.debug("Required property: " + key + " = " + val);
+        return val.trim();
     }
     
     /**
@@ -206,9 +194,8 @@ public class FedoraOAIDriver implements OAIDriver {
         logger.debug(key + " = " + val);
         if (val == null) {
             return "";
-        } else {
-            return val.trim();
         }
+        return val.trim();
     }
 
     private void writeStream(InputStream in, 
