@@ -48,7 +48,7 @@ public class FedoraRecord implements Record, Writable {
     }
     
     public void write(PrintWriter out) throws ServerException {
-        out.println("<record>");
+    	out.println("<record>");
         writeHeader(out);
         if (!m_deleted) {
             writeMetadata(out);
@@ -111,7 +111,7 @@ public class FedoraRecord implements Record, Writable {
             String xml = buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
             int i = xml.indexOf(aboutWrapperStart);
             if (i == -1) throw new RepositoryException("Bad abouts xml: opening " + aboutWrapperStart + " not found");
-            xml = xml.substring(i + aboutWrapperStart.length() + 1);
+            xml = xml.substring(i + aboutWrapperStart.length());
             i = xml.lastIndexOf(aboutWrapperEnd);
             if (i == -1) throw new RepositoryException("Bad abouts xml: closing " + aboutWrapperEnd + " not found");
             out.print(xml.substring(0, i));
