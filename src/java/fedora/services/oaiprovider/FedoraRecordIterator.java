@@ -17,6 +17,7 @@ import org.trippi.TupleIterator;
 import proai.Record;
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
+import fedora.client.FedoraClient;
 import fedora.common.Constants;
 
 /**

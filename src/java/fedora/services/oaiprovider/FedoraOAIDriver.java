@@ -18,6 +18,8 @@ import proai.driver.OAIDriver;
 import proai.driver.RemoteIterator;
 import proai.driver.impl.RemoteIteratorImpl;
 import proai.error.RepositoryException;
+import fedora.client.FedoraClient;
+import fedora.client.HttpInputStream;
 
 /**
  * Implementation of the OAIDriver interface for Fedora.

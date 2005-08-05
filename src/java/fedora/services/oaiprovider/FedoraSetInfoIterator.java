@@ -14,6 +14,7 @@ import org.trippi.TupleIterator;
 import proai.SetInfo;
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
+import fedora.client.FedoraClient;
 
 public class FedoraSetInfoIterator implements RemoteIterator {
 

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import proai.driver.RemoteIterator;
+import fedora.client.FedoraClient;
 
 /**
  * Interface for language-specific query handlers to the Fedora Resource Index.

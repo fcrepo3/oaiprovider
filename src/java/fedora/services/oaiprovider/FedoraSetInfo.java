@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 
 import proai.SetInfo;
 import proai.error.RepositoryException;
+import fedora.client.FedoraClient;
 
 /**
  * SetInfo impl that includes setDescription elements for

@@ -10,6 +10,7 @@ import proai.Record;
 import proai.Writable;
 import proai.error.RepositoryException;
 import proai.error.ServerException;
+import fedora.client.FedoraClient;
 
 /**
  * @author Edwin Shin
@@ -84,10 +85,10 @@ public class FedoraRecord implements Record, Writable {
                 line = reader.readLine();
             }
             out.println("  <metadata>");
-            out.print(buf.toString());
+            out.print(buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", ""));
             out.println("  </metadata>");
         } catch (IOException e) {
-            throw new RepositoryException("IO error reading " + m_aboutDiss, e);
+            throw new RepositoryException("IO error reading " + m_recordDiss, e);
         } finally {
             if (in != null) try { in.close(); } catch (IOException e) { }
         }
@@ -97,7 +98,7 @@ public class FedoraRecord implements Record, Writable {
         String aboutWrapperStart = "<abouts>";
         String aboutWrapperEnd = "</abouts>";
         InputStream in = null;
-        try {
+        try {        	
             in = m_fedora.get(m_aboutDiss, true);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuffer buf = new StringBuffer();
@@ -106,7 +107,8 @@ public class FedoraRecord implements Record, Writable {
                 buf.append(line + "\n");
                 line = reader.readLine();
             }
-            String xml = buf.toString();
+            // strip xml declaration and leading whitespace
+            String xml = buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
             int i = xml.indexOf(aboutWrapperStart);
             if (i == -1) throw new RepositoryException("Bad abouts xml: opening " + aboutWrapperStart + " not found");
             xml = xml.substring(i + aboutWrapperStart.length() + 1);
