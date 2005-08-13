@@ -13,7 +13,7 @@
   </category>
   
   <category name="proai">
-    <priority value="INFO" />
+    <priority value="DEBUG" />
   </category>
 <!--
   <category name="proai.cache.ReadWriteLock">
