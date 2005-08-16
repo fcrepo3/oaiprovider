@@ -36,6 +36,10 @@ public class FedoraOAIDriver implements OAIDriver {
     public static final String PROP_BASEURL               = NS + "baseURL";
     public static final String PROP_USER                  = NS + "user";
     public static final String PROP_PASS                  = NS + "pass";
+    public static final String PROP_QUERY_CONN_TIMEOUT    = NS + "queryConnectionTimeout";
+    public static final String PROP_QUERY_SOCK_TIMEOUT    = NS + "querySocketTimeout";
+    public static final String PROP_DISS_CONN_TIMEOUT     = NS + "disseminationConnectionTimeout";
+    public static final String PROP_DISS_SOCK_TIMEOUT     = NS + "disseminationSocketTimeout";
     public static final String PROP_IDENTIFY              = NS + "identify";
     public static final String PROP_ITEMID                = NS + "itemID";
     public static final String PROP_SETSPEC               = NS + "setSpec";
@@ -86,6 +90,8 @@ public class FedoraOAIDriver implements OAIDriver {
         String className = getRequired(props, PROP_QUERY_FACTORY);
         try {
             m_fedora = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
+            m_fedora.TIMEOUT_SECONDS = getRequiredInt(props, PROP_DISS_CONN_TIMEOUT);
+            m_fedora.SOCKET_TIMEOUT_SECONDS = getRequiredInt(props, PROP_DISS_SOCK_TIMEOUT);
         } catch (Exception e) {
             throw new RepositoryException("Error parsing baseURL", e);
         }
@@ -93,7 +99,10 @@ public class FedoraOAIDriver implements OAIDriver {
         try {
             Class queryFactoryClass = Class.forName(className);
             m_queryFactory = (QueryFactory) queryFactoryClass.newInstance();
-            m_queryFactory.init(m_fedora, props);
+            FedoraClient queryClient = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
+            queryClient.TIMEOUT_SECONDS = getRequiredInt(props, PROP_QUERY_CONN_TIMEOUT);
+            queryClient.SOCKET_TIMEOUT_SECONDS = getRequiredInt(props, PROP_QUERY_SOCK_TIMEOUT);
+            m_queryFactory.init(queryClient, props);
         } catch (Exception e) {
             throw new RepositoryException("Unable to initialize " + className, e);
         }
@@ -183,6 +192,15 @@ public class FedoraOAIDriver implements OAIDriver {
         }
         logger.debug("Required property: " + key + " = " + val);
         return val.trim();
+    }
+
+    protected static int getRequiredInt(Properties props, String key) throws RepositoryException {
+        String val = getRequired(props, key);
+        try {
+            return Integer.parseInt(val);
+        } catch (Exception e) {
+            throw new RepositoryException("Value of property " + key + " is not an integer: " + val);
+        }
     }
     
     /**
