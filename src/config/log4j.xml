@@ -9,17 +9,20 @@
   </appender>
 
   <category name="fedora.services.oaiprovider">
-    <priority value="INFO" />
+    <priority value="DEBUG" />
+  </category>
+
+  <category name="fedora.client.FedoraClient">
+    <priority value="DEBUG" />
   </category>
   
   <category name="proai">
     <priority value="DEBUG" />
   </category>
-<!--
-  <category name="proai.cache.ReadWriteLock">
-    <priority value="DEBUG" />
+  
+  <category name="org.apache.commons.httpclient.HttpMethodBase">
+    <priority value="ERROR" />
   </category>
--->
 
   <root>
     <priority value="WARN" />
