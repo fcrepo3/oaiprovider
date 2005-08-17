@@ -30,11 +30,13 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     private String m_deleted;
     private boolean m_volatile;
     private FedoraClient m_fedora;
+    private FedoraClient m_queryClient;
     
     public ITQLQueryFactory() {}
 
-    public void init(FedoraClient client, Properties props) {
+    public void init(FedoraClient client, FedoraClient queryClient, Properties props) {
         m_fedora = client;
+        m_queryClient = queryClient;
         m_oaiItemID = FedoraOAIDriver.getRequired(props, FedoraOAIDriver.PROP_ITEMID);
 
         m_setSpec = FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_SETSPEC);
@@ -277,7 +279,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         parameters.put("query", query);
         
         try {
-            return m_fedora.getTuples(parameters);
+            return m_queryClient.getTuples(parameters);
         } catch (IOException e) {
             throw new RepositoryException("Error getting tuples from Fedora: " +
                                           e.getMessage(), e);

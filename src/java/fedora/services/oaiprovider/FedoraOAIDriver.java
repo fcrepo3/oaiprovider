@@ -102,7 +102,7 @@ public class FedoraOAIDriver implements OAIDriver {
             FedoraClient queryClient = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
             queryClient.TIMEOUT_SECONDS = getRequiredInt(props, PROP_QUERY_CONN_TIMEOUT);
             queryClient.SOCKET_TIMEOUT_SECONDS = getRequiredInt(props, PROP_QUERY_SOCK_TIMEOUT);
-            m_queryFactory.init(queryClient, props);
+            m_queryFactory.init(m_fedora, queryClient, props);
         } catch (Exception e) {
             throw new RepositoryException("Unable to initialize " + className, e);
         }

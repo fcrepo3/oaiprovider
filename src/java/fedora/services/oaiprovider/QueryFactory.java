@@ -13,7 +13,7 @@ import fedora.client.FedoraClient;
  */
 public interface QueryFactory {
 
-    public void init(FedoraClient client, Properties props);
+    public void init(FedoraClient client, FedoraClient queryClient, Properties props);
     
     /**
      * Queries the Fedora Resource Index for the latest last-modified date of 
