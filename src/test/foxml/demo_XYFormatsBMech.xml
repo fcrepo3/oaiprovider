@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:XYFormatsBMech" fedoraxsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-0.xsd"
+  xmlns:fedoraxsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="http://www.w3.org/1999/02/22-rdf-syntax-ns#type" VALUE="FedoraBMechObject"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="BMech for providing X and Y format disseminations using a stylesheet"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#contentModel" VALUE="fedora:BMECH"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Metadata for Service" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>BMech for providing X and Y format disseminations using a stylesheet</dc:title>
+          <dc:description>This is a Fedora Behavior Mechanism object that defines
+          the bindings for the methods defined in demo:XYFormatsBDef.  It fulfills
+          the behavior contract by binding to a source document (an all-inclusive
+          document that encodes the x and y formats and their associated abouts)
+          and a style document (an xslt stylesheet).  These, along with the
+          user-supplied format parameter, are passed to the local saxon servlet
+          with a hardcoded parameter for each method indicating whether the
+          "about" is requested or not.
+          </dc:description>
+          <dc:creator>Chris Wilper</dc:creator>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="METHODMAP1.0" LABEL="Mapping of WSDL to Fedora notion of Method Definitions" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fmm:MethodMap bDefPID="demo:XYFormatsBDef" name="MethodMap" xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+          <fmm:Method operationLabel="Get the Metadata block in a format" operationName="getMetadata" wsdlMsgName="getMetadataRequest" wsdlMsgOutput="dissemResponse">
+            <fmm:UserInputParm defaultValue="" label="metatadata format" parmName="format" passBy="VALUE" required="true">
+              <fmm:ValidParmValues>
+                <fmm:ValidParm value="x"/>
+                <fmm:ValidParm value="y"/>
+              </fmm:ValidParmValues>
+            </fmm:UserInputParm>
+            <fmm:DatastreamInputParm defaultValue="" label="" parmName="SOURCE" passBy="URL_REF" required="true"/>
+            <fmm:DatastreamInputParm defaultValue="" label="" parmName="STYLE" passBy="URL_REF" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/xml"/>
+          </fmm:Method>
+          <fmm:Method operationLabel="get the about block for a metadata format" operationName="getMetadataAbout" wsdlMsgName="getMetadataAboutRequest" wsdlMsgOutput="dissemResponse">
+            <fmm:UserInputParm defaultValue="" label="metatadata format" parmName="format" passBy="VALUE" required="true">
+              <fmm:ValidParmValues>
+                <fmm:ValidParm value="x"/>
+                <fmm:ValidParm value="y"/>
+              </fmm:ValidParmValues>
+            </fmm:UserInputParm>
+            <fmm:DatastreamInputParm defaultValue="" label="" parmName="SOURCE" passBy="URL_REF" required="true"/>
+            <fmm:DatastreamInputParm defaultValue="" label="" parmName="STYLE" passBy="URL_REF" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/xml"/>
+          </fmm:Method>
+        </fmm:MethodMap>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="WSDL" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="WSDL1.0" LABEL="WSDL definition of service" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <wsdl:definitions name="Operations on NSDL metadata objects" targetNamespace="bmech"
+          xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+          xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
+          xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/soap/encoding" xmlns:this="bmech"
+          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <wsdl:types>
+            <xsd:schema targetNamespace="bmech">
+              <xsd:simpleType name="formatType">
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="x"/>
+                  <xsd:enumeration value="y"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+              <xsd:simpleType name="sourceType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+              <xsd:simpleType name="styleType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+            </xsd:schema>
+          </wsdl:types>
+          <wsdl:message name="getMetadataRequest">
+            <wsdl:part name="SOURCE" type="this:sourceType"/>
+            <wsdl:part name="STYLE" type="this:styleType"/>
+            <wsdl:part name="format" type="this:formatType"/>
+          </wsdl:message>
+          <wsdl:message name="getMetadataAboutRequest">
+            <wsdl:part name="SOURCE" type="this:sourceType"/>
+            <wsdl:part name="STYLE" type="this:styleType"/>
+            <wsdl:part name="format" type="this:formatType"/>
+          </wsdl:message>
+          <wsdl:message name="dissemResponse">
+            <wsdl:part name="dissem" type="xsd:base64Binary"/>
+          </wsdl:message>
+          <wsdl:portType name="metadataOperationsPortType">
+            <wsdl:operation name="getMetadata">
+              <wsdl:input message="this:getMetadataRequest"/>
+              <wsdl:output message="this:dissemResponse"/>
+            </wsdl:operation>
+            <wsdl:operation name="getMetadataAbout">
+              <wsdl:input message="this:getMetadataAboutRequest"/>
+              <wsdl:output message="this:dissemResponse"/>
+            </wsdl:operation>
+          </wsdl:portType>
+          <wsdl:service name="metadataOperations">
+            <wsdl:port binding="this:metadataOperations_http" name="metadataOperations_port">
+              <http:address location="http://local.fedora.server/"/>
+            </wsdl:port>
+          </wsdl:service>
+          <wsdl:binding name="metadataOperations_http" type="this:metadataOperationsPortType">
+            <http:binding verb="GET"/>
+            <wsdl:operation name="getMetadata">
+              <http:operation location="saxon/SaxonServlet?source=(SOURCE)&amp;style=(STYLE)&amp;format=(format)&amp;about=false&amp;clear-stylesheet-cache=true"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="text/xml"/>
+              </wsdl:output>
+            </wsdl:operation>
+            <wsdl:operation name="getMetadataAbout">
+              <http:operation location="saxon/SaxonServlet?source=(SOURCE)&amp;style=(STYLE)&amp;format=(format)&amp;about=true&amp;clear-stylesheet-cache=true"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="text/xml"/>
+              </wsdl:output>
+            </wsdl:operation>
+          </wsdl:binding>
+        </wsdl:definitions>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="SERVICE-PROFILE" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="SERVICE-PROFILE1.0" LABEL="Service Profile - Technical description of the service" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fsvp:serviceProfile bDefPID="demo:XYFormatsBDef" name="" xmlns:fsvp="http://fedora.comm.nsdlib.org/service/profile">
+          <fsvp:serviceDescription/>
+          <fsvp:serviceImplementation>
+            <fsvp:serviceLiveTestURL/>
+            <fsvp:serviceMessagingProtocol>HTTP GET</fsvp:serviceMessagingProtocol>
+            <fsvp:serviceInputFormats>
+              <fsvp:MIMEType>text/xml</fsvp:MIMEType>
+            </fsvp:serviceInputFormats>
+            <fsvp:serviceOutputFormats>
+              <fsvp:MIMEType>text/xml</fsvp:MIMEType>
+            </fsvp:serviceOutputFormats>
+            <fsvp:serviceImplDependencies/>
+          </fsvp:serviceImplementation>
+        </fsvp:serviceProfile>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream ID="DSINPUTSPEC" CONTROL_GROUP="X" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion ID="DSINPUTSPEC1.0" LABEL="Datastream Input Specification for Service" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fbs:DSInputSpec bDefPID="demo:XYFormatsBDef" label="Datastream Input Specification" xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec">
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="SOURCE">
+            <fbs:DSInputLabel>Source XML</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction/>
+          </fbs:DSInput>
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="STYLE">
+            <fbs:DSInputLabel>XSL Stylesheet</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction/>
+          </fbs:DSInput>
+        </fbs:DSInputSpec>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:disseminator BDEF_CONTRACT_PID="fedora-system:1" ID="DISS1" STATE="A" VERSIONABLE="true">
+    <foxml:disseminatorVersion BMECH_SERVICE_PID="fedora-system:2" ID="DISS1.0" LABEL="Bootstrap Behaviors for a behavior object">
+      <foxml:serviceInputMap>
+        <foxml:datastreamBinding DATASTREAM_ID="SERVICE-PROFILE" KEY="SERVICE-PROFILE" LABEL="XML data that describes the technical nature of the service"/>
+        <foxml:datastreamBinding DATASTREAM_ID="DSINPUTSPEC" KEY="FEDORA-TO-WSDL-DSINPUTSPEC" LABEL="XML data that describes the requirements for Datastreams that will be used as input to this service"/>
+        <foxml:datastreamBinding DATASTREAM_ID="METHODMAP" KEY="FEDORA-TO-WSDL-METHODMAP" LABEL="XML data that enables Fedora to understand how to use the service WSDL"/>
+        <foxml:datastreamBinding DATASTREAM_ID="WSDL" KEY="WSDL" LABEL="Service definition in WSDL format."/>
+      </foxml:serviceInputMap>
+    </foxml:disseminatorVersion>
+  </foxml:disseminator>
+</foxml:digitalObject>
