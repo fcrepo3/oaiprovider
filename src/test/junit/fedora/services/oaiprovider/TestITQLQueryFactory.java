@@ -22,7 +22,7 @@ public class TestITQLQueryFactory extends TestCase {
         
         ITQLQueryFactory iqf = new ITQLQueryFactory();
         QueryFactory qf = (QueryFactory) iqf;
-        qf.init(null, props);
+        qf.init(null, null, props);
         String query = iqf.getLatestRecordDateQuery();
         
         String q = "select $date\n" +
@@ -52,7 +52,7 @@ public class TestITQLQueryFactory extends TestCase {
         
         ITQLQueryFactory iqf = new ITQLQueryFactory();
         QueryFactory qf = (QueryFactory)iqf;
-        qf.init(null, props);
+        qf.init(null, null, props);
         
         Date df = new Date(0L); // the epoch (1970-01-01T00:00:00 GMT)
         Date du = new Date(1000000000000L); // the billenium (2001-09-09T:01:46:40 UTC)
@@ -99,7 +99,7 @@ public class TestITQLQueryFactory extends TestCase {
         props.put(FedoraOAIDriver.PROP_ITEM_SETSPEC_PATH, ssp);
         ITQLQueryFactory iqf = new ITQLQueryFactory();
         QueryFactory qf = (QueryFactory) iqf;
-        qf.init(null, props);
+        qf.init(null, null, props);
 
         assertEquals("$item <urn:foo> $set and $set <urn:bar> $setSpec", 
                      iqf.parseItemSetSpecPath(ssp));
