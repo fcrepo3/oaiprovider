@@ -120,13 +120,14 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                        "    select $volatile\n" +
                        "    from <#ri>\n" +
                        "    where $x <" + m_oaiItemID + "> $y\n" +
-                       "      and $x <" + VIEW.DISSEMINATES.uri + "> $z\n" +
+                       "      and $x $h $z\n" +
                        "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
                        "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
                        "  )\n" +
                        "from <#ri>\n" +
                        "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
-                       "  and $object <" + VIEW.DISSEMINATES.uri + "> $diss\n" +
+                       "  and $object $has $diss\n" +
+                       "  and $diss <" + VIEW.MIME_TYPE.uri + "> $mimeType\n" +
                        "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
                        "  order by $date desc\n" +
                        "  limit 1\n";
@@ -183,7 +184,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    where\n");
         if (set) {
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + VIEW.DISSEMINATES.uri + "> $recordDiss\n" +
+                         "      and $item $has $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
                          "      and " + m_itemSetSpecPath + "\n");
         } else {
@@ -198,9 +199,9 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    where\n");
         if (about) {
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + VIEW.DISSEMINATES.uri + "> $recordDiss\n" +
+                         "      and $item $has $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
-                         "      and $item <" + VIEW.DISSEMINATES.uri + "> $aboutDiss\n" +
+                         "      and $item $alsoHas $aboutDiss\n" +
                          "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixAboutDissType + ">");
         } else {
             // we don't want to match anything
@@ -211,7 +212,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         query.append("from <#ri>\n" +
                       "where\n" +
                       "  $item <" + m_oaiItemID + "> $itemID\n" +
-                      "  and $item <" + VIEW.DISSEMINATES.uri + "> $recordDiss\n" +
+                      "  and $item $has $recordDiss\n" +
                       "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
                       "  and $recordDiss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n");
         
@@ -233,14 +234,14 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
             
             query.append("  and $date <" + TUCANA.AFTER + "> '" + 
                          DateUtility.convertDateToString(from) + 
-                         "' in <#xsd>\n");
+                         "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
         }
         if (until != null) {
             // increment date by 1 millisecond
             until.setTime(until.getTime() + 1);
             query.append("  and $date <" + TUCANA.BEFORE + "> '" + 
                          DateUtility.convertDateToString(until) + 
-                         "' in <#xsd>\n");
+                         "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
         }
         
         query.append("  order by $itemID asc\n");
@@ -258,7 +259,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         if (setDesc) {
             query.append("      $set <" + m_setSpec + "> $setSpec\n" +
                          "      and $set <" + m_setSpecName + "> $setName\n" +
-	        		     "      and $set <" + VIEW.DISSEMINATES.uri + "> $setDiss\n" +
+	        		     "      and $set $has $setDiss\n" +
 	        		     "      and $setDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + m_setSpecDescDissType + ">");
         } else {
             // we don't want to match anything
@@ -325,4 +326,5 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         }
         return(sb.toString());
     }
+
 }
