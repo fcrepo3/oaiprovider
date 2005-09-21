@@ -177,7 +177,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         boolean set = !m_setSpec.equals("");
         boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
         StringBuffer query = new StringBuffer();
-        query.append("select $itemID $recordDiss $date $deleted\n" +
+        query.append("select $item $recordDissType $itemID $date $deleted\n" +
                      "  subquery(\n" +
                      "    select $setSpec\n " +
                      "    from <#ri>\n" +
@@ -194,7 +194,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         query.append("  )\n");
         
         query.append("  subquery(\n" +
-                     "    select $aboutDiss\n" +
+                     "    select $aboutDissType\n" +
                      "    from <#ri>\n" +
                      "    where\n");
         if (about) {
@@ -202,10 +202,11 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                          "      and $item $has $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
                          "      and $item $alsoHas $aboutDiss\n" +
-                         "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixAboutDissType + ">");
+                         "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $aboutDissType\n" +
+						 "      and $aboutDissType <" + TUCANA.IS.uri + "> <" + mdPrefixAboutDissType + ">");
         } else {
             // we don't want to match anything
-            query.append("      $aboutDiss <test:noMatch> <test:noMatch>");
+            query.append("      $aboutDissType <test:noMatch> <test:noMatch>");
         }
         query.append(")\n");
 
@@ -213,7 +214,8 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                       "where\n" +
                       "  $item <" + m_oaiItemID + "> $itemID\n" +
                       "  and $item $has $recordDiss\n" +
-                      "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
+                      "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $recordDissType\n" +
+                      "  and $recordDissType <" + TUCANA.IS.uri + "> <" + mdPrefixDissType + ">\n" +
                       "  and $recordDiss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n");
         
         // FedoraOAIDriver.PROP_DELETED is an optional, object-level (as opposed

@@ -19,6 +19,8 @@ import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 import fedora.client.FedoraClient;
 import fedora.common.Constants;
+import fedora.common.MalformedPIDException;
+import fedora.common.PID;
 
 /**
  * @author Edwin Shin
@@ -39,6 +41,7 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
      * The tuples should look like:
      * <pre>
      * itemID   recordDiss   date   deleted   setSpec   aboutDiss
+     * item recordDissType itemID date deleted setSpec aboutDissType
      * </pre>
      */
     public FedoraRecordIterator(FedoraClient fedora, TupleIterator tuples) {
@@ -92,29 +95,36 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
             if (group.size() == 0) return null;
             Iterator it = group.iterator();
             
+            PID item = null;
+            String recordDissType = null;
             String itemID = null;
-            String recordDiss = null;
             String date = null;
             boolean isDeleted = false;
             Set sets = new HashSet();
+            String aboutDissType = null;
+            
+            String recordDiss = null;
             String aboutDiss = null;
             String[] values;
             while (it.hasNext() && !isDeleted) {
                 values = (String[])it.next();
-                if (itemID == null) itemID = values[0];
-                if (recordDiss == null) recordDiss = values[1];
-                if (date == null) {
-                    date = formatDatetime(values[2]);
+                if (item == null) item = new PID(values[0]);
+                if (recordDissType == null) {
+                	recordDissType = values[1];
+                	recordDiss = recordDissType.replaceFirst("\\*", item.toString());
                 }
-                isDeleted = !values[3].equals(MODEL.ACTIVE.uri);
+                if (itemID == null) itemID = values[2];
+                if (date == null) date = formatDatetime(values[3]);
+                isDeleted = !values[4].equals(MODEL.ACTIVE.uri);
                 
                 // sets and about are optional
-                if (values[4] != null && !values[4].equals("")) {
-                        sets.add(values[4]);
+                if (values[5] != null && !values[5].equals("")) {
+                        sets.add(values[5]);
                 }
                 
-                if (aboutDiss == null && values[5] != null && !values[5].equals("")) {
-                    aboutDiss = values[5];
+                if (aboutDissType == null && values[6] != null && !values[6].equals("")) {
+                    aboutDissType = values[6];
+                    aboutDiss = aboutDissType.replaceFirst("\\*", item.toString());
                 }
             }
             String[] setSpecs = new String[sets.size()];
@@ -128,7 +138,9 @@ public class FedoraRecordIterator implements RemoteIterator, Constants {
                                     aboutDiss);
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
-        }
+        } catch (MalformedPIDException e) {
+        	throw new RepositoryException("Error getting next tuple", e);
+		}
     }
     
     /**
