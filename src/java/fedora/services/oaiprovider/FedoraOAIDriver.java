@@ -123,7 +123,7 @@ public class FedoraOAIDriver implements OAIDriver {
 
     // TODO: date for volatile disseminations?
     public Date getLatestDate() throws RepositoryException {
-        return m_queryFactory.latestRecordDate();
+        return m_queryFactory.latestRecordDate(m_metadataFormats.values().iterator());
     }
 
     public RemoteIterator listMetadataFormats() throws RepositoryException {

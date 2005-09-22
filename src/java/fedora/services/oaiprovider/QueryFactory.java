@@ -1,6 +1,7 @@
 package fedora.services.oaiprovider;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Properties;
 
 import proai.driver.RemoteIterator;
@@ -17,11 +18,12 @@ public interface QueryFactory {
     
     /**
      * Queries the Fedora Resource Index for the latest last-modified date of 
-     * a dissemination for all objects that have an OAI itemID property.
+     * all disseminations that act as metadata for the OAI provider.
      * 
+     * @param fedoraMetadataFormats the list of all FedoraMetadataFormats
      * @return date of the latest record
      */
-    public Date latestRecordDate();
+    public Date latestRecordDate(Iterator fedoraMetadataFormats);
     
     /**
      * 

@@ -3,6 +3,7 @@ package fedora.services.oaiprovider;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,13 +50,53 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         m_deleted = FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_DELETED);
         m_volatile = !(FedoraOAIDriver.getOptional(props, FedoraOAIDriver.PROP_VOLATILE).equals(""));
     }
-    
+
     /**
-     * Returns the date of the latest record in the repository.
+     * Queries the Fedora Resource Index for the latest last-modified date of 
+     * all disseminations that act as metadata for the OAI provider.
      * 
+     * @param fedoraMetadataFormats the list of all FedoraMetadataFormats
+     * @return date of the latest record
      */
-    public Date latestRecordDate() {
-        TupleIterator tuples = getTuples(getLatestRecordDateQuery());
+    public Date latestRecordDate(Iterator formats) {
+        Date latest = null;
+        while (formats.hasNext()) {
+            FedoraMetadataFormat format = (FedoraMetadataFormat) formats.next();
+            Date date = latestRecordDate(format.getDissType());
+            if (date == null) {
+                logger.info("Format '" + format.getPrefix() + "' had at least "
+                        + "one volatile representation; will force update");
+                return new Date();
+            } else {
+                if (date.getTime() == 0) {
+                    logger.info("No records were found in format '" 
+                            + format.getPrefix() + "'");
+                } else {
+                    logger.info("Latest date for records of format '" 
+                            + format.getPrefix() + "' was " 
+                            + DateUtility.convertDateToString(date));
+                }
+                if (latest == null) {
+                    latest = date;
+                } else {
+                    if (date.getTime() > latest.getTime()) {
+                        latest = date;
+                    }
+                }
+            }
+        }
+        logger.info("Latest date of all records was " 
+                + DateUtility.convertDateToString(latest));
+        return latest;
+    }
+
+    /**
+     * Query to find the latest-dated record of the format indicated by
+     * the given dissType, or return null if at least one of the matching
+     * records is volatile.
+     */
+    private Date latestRecordDate(String dissType) {
+        TupleIterator tuples = getTuples(getLatestRecordDateQuery(dissType));
         try {
             if (tuples.hasNext()) {
                 Map row = tuples.next();
@@ -70,8 +111,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                     return DateUtility.parseDateAsUTC(dateLiteral.getLexicalForm());
                 }
             } else {
-                // no tuples... what to do?
-                throw new RepositoryException("No rows returned from query");
+                return new Date(0); // no records found for this format.
             }
         } catch (Exception e) {
             throw new RepositoryException("Error querying for latest changed record date: " + 
@@ -85,6 +125,39 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         }
     }
 
+    private String getPredicate(String dissType) {
+        String[] parts = dissType.split("/"); //    info:fedora/*/DC 
+                                              // vs info:fedora/*/demo:10/getXYZ
+        if (parts.length == 3) {
+            return VIEW.HAS_DATASTREAM.uri;
+        } else {
+            return VIEW.HAS_METHOD.uri;
+        }
+    }
+
+    private String getLatestRecordDateQuery(String dissType) {
+        String disseminates = getPredicate(dissType);
+        String query = "select $date\n" +
+                       "  subquery(\n" +
+                       "    select $volatile\n" +
+                       "    from <#ri>\n" +
+                       "    where $x <" + m_oaiItemID + "> $y\n" +
+                       "      and $x <" + disseminates + "> $z\n" +
+                       "      and $z <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
+                       "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
+                       "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
+                       "  )\n" +
+                       "from <#ri>\n" +
+                       "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
+                       "  and $object <" + disseminates + "> $diss\n" +
+                       "  and $diss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
+                       "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
+                       "  order by $date desc\n" +
+                       "  limit 1\n";
+        return query;
+    }
+
+
     public RemoteIterator listSetInfo() {
         TupleIterator tuples = getTuples(getListSetInfoQuery());
         return new FedoraSetInfoIterator(m_fedora, tuples);
@@ -97,41 +170,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                                              mdPrefixAboutDissType, withContent);
         TupleIterator tuples = getTuples(query);
         return new FedoraRecordIterator(m_fedora, tuples);
-    }
-    
-    /**
-     * Builds the iTQL query for latest record date.
-     * 
-     * Uses a query similar to the following: 
-     * <pre>
- select $date
- from &lt;#ri&gt;
- where $object &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $oaiItemID
-   and $object &lt;fedora-view:disseminates&gt; $diss
-   and $diss &lt;fedora-view:lastModifiedDate&gt; $date
-   order by $date desc
-   limit 1
-     * </pre>
-     * @return the iTQL query for latestRecordDate
-     */
-    protected String getLatestRecordDateQuery() {
-        String query = "select $date\n" +
-                       "  subquery(\n" +
-                       "    select $volatile\n" +
-                       "    from <#ri>\n" +
-                       "    where $x <" + m_oaiItemID + "> $y\n" +
-                       "      and $x $h $z\n" +
-                       "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
-                       "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
-                       "  )\n" +
-                       "from <#ri>\n" +
-                       "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
-                       "  and $object $has $diss\n" +
-                       "  and $diss <" + VIEW.MIME_TYPE.uri + "> $mimeType\n" +
-                       "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
-                       "  order by $date desc\n" +
-                       "  limit 1\n";
-        return query;
     }
     
     /**
@@ -174,6 +212,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                                       String mdPrefixDissType, 
                                       String mdPrefixAboutDissType, 
                                       boolean withContent) {
+        String disseminates = getPredicate(mdPrefixDissType);
         boolean set = !m_setSpec.equals("");
         boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
         StringBuffer query = new StringBuffer();
@@ -184,7 +223,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    where\n");
         if (set) {
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item $has $recordDiss\n" +
+                         "      and $item <" + disseminates + "> $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
                          "      and " + m_itemSetSpecPath + "\n");
         } else {
@@ -198,10 +237,11 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    from <#ri>\n" +
                      "    where\n");
         if (about) {
+            String aboutDisseminates = getPredicate(mdPrefixAboutDissType);
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item $has $recordDiss\n" +
+                         "      and $item <" + disseminates + "> $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
-                         "      and $item $alsoHas $aboutDiss\n" +
+                         "      and $item <" + aboutDisseminates + "> $aboutDiss\n" +
                          "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $aboutDissType\n" +
 						 "      and $aboutDissType <" + TUCANA.IS.uri + "> <" + mdPrefixAboutDissType + ">");
         } else {
@@ -213,7 +253,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         query.append("from <#ri>\n" +
                       "where\n" +
                       "  $item <" + m_oaiItemID + "> $itemID\n" +
-                      "  and $item $has $recordDiss\n" +
+                      "  and $item <" + disseminates + "> $recordDiss\n" +
                       "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $recordDissType\n" +
                       "  and $recordDissType <" + TUCANA.IS.uri + "> <" + mdPrefixDissType + ">\n" +
                       "  and $recordDiss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n");
@@ -259,9 +299,10 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         		     "	  from <#ri>\n" +
         		     "      where\n");
         if (setDesc) {
+            String setDisseminates = getPredicate(m_setSpecDescDissType);
             query.append("      $set <" + m_setSpec + "> $setSpec\n" +
                          "      and $set <" + m_setSpecName + "> $setName\n" +
-	        		     "      and $set $has $setDiss\n" +
+	        		     "      and $set <" + setDisseminates + "> $setDiss\n" +
 	        		     "      and $setDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + m_setSpecDescDissType + ">");
         } else {
             // we don't want to match anything
