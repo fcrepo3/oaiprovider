@@ -125,31 +125,20 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         }
     }
 
-    private String getPredicate(String dissType) {
-        String[] parts = dissType.split("/"); //    info:fedora/*/DC 
-                                              // vs info:fedora/*/demo:10/getXYZ
-        if (parts.length == 3) {
-            return VIEW.HAS_DATASTREAM.uri;
-        } else {
-            return VIEW.HAS_METHOD.uri;
-        }
-    }
-
     private String getLatestRecordDateQuery(String dissType) {
-        String disseminates = getPredicate(dissType);
         String query = "select $date\n" +
                        "  subquery(\n" +
                        "    select $volatile\n" +
                        "    from <#ri>\n" +
                        "    where $x <" + m_oaiItemID + "> $y\n" +
-                       "      and $x <" + disseminates + "> $z\n" +
+                       "      and $x <" + VIEW.DISSEMINATES + "> $z\n" +
                        "      and $z <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
                        "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
                        "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
                        "  )\n" +
                        "from <#ri>\n" +
                        "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
-                       "  and $object <" + disseminates + "> $diss\n" +
+                       "  and $object <" + VIEW.DISSEMINATES + "> $diss\n" +
                        "  and $diss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
                        "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
                        "  order by $date desc\n" +
@@ -212,7 +201,6 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                                       String mdPrefixDissType, 
                                       String mdPrefixAboutDissType, 
                                       boolean withContent) {
-        String disseminates = getPredicate(mdPrefixDissType);
         boolean set = !m_setSpec.equals("");
         boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
         StringBuffer query = new StringBuffer();
@@ -223,7 +211,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    where\n");
         if (set) {
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + disseminates + "> $recordDiss\n" +
+                         "      and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
                          "      and " + m_itemSetSpecPath + "\n");
         } else {
@@ -237,11 +225,10 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
                      "    from <#ri>\n" +
                      "    where\n");
         if (about) {
-            String aboutDisseminates = getPredicate(mdPrefixAboutDissType);
             query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + disseminates + "> $recordDiss\n" +
+                         "      and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
                          "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
-                         "      and $item <" + aboutDisseminates + "> $aboutDiss\n" +
+                         "      and $item <" + VIEW.DISSEMINATES + "> $aboutDiss\n" +
                          "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $aboutDissType\n" +
 						 "      and $aboutDissType <" + TUCANA.IS.uri + "> <" + mdPrefixAboutDissType + ">");
         } else {
@@ -253,7 +240,7 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         query.append("from <#ri>\n" +
                       "where\n" +
                       "  $item <" + m_oaiItemID + "> $itemID\n" +
-                      "  and $item <" + disseminates + "> $recordDiss\n" +
+                      "  and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
                       "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $recordDissType\n" +
                       "  and $recordDissType <" + TUCANA.IS.uri + "> <" + mdPrefixDissType + ">\n" +
                       "  and $recordDiss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n");
@@ -299,10 +286,9 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         		     "	  from <#ri>\n" +
         		     "      where\n");
         if (setDesc) {
-            String setDisseminates = getPredicate(m_setSpecDescDissType);
             query.append("      $set <" + m_setSpec + "> $setSpec\n" +
                          "      and $set <" + m_setSpecName + "> $setName\n" +
-	        		     "      and $set <" + setDisseminates + "> $setDiss\n" +
+	        		     "      and $set <" + VIEW.DISSEMINATES + "> $setDiss\n" +
 	        		     "      and $setDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + m_setSpecDescDissType + ">");
         } else {
             // we don't want to match anything
