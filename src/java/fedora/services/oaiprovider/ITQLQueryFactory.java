@@ -52,42 +52,21 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
 
     /**
-     * Queries the Fedora Resource Index for the latest last-modified date of 
-     * all disseminations that act as metadata for the OAI provider.
+     * Rather than querying for this information, which can be costly,
+     * simply return the current date as reported by the remote Fedora server.
      * 
      * @param fedoraMetadataFormats the list of all FedoraMetadataFormats
-     * @return date of the latest record
+     * @return current date according to Fedora
      */
-    public Date latestRecordDate(Iterator formats) {
-        Date latest = null;
-        while (formats.hasNext()) {
-            FedoraMetadataFormat format = (FedoraMetadataFormat) formats.next();
-            Date date = latestRecordDate(format.getDissType());
-            if (date == null) {
-                logger.info("Format '" + format.getPrefix() + "' had at least "
-                        + "one volatile representation; will force update");
-                return new Date();
-            } else {
-                if (date.getTime() == 0) {
-                    logger.info("No records were found in format '" 
-                            + format.getPrefix() + "'");
-                } else {
-                    logger.info("Latest date for records of format '" 
-                            + format.getPrefix() + "' was " 
-                            + DateUtility.convertDateToString(date));
-                }
-                if (latest == null) {
-                    latest = date;
-                } else {
-                    if (date.getTime() > latest.getTime()) {
-                        latest = date;
-                    }
-                }
-            }
+    public Date latestRecordDate(Iterator formats) throws RepositoryException {
+        try {
+            Date current = m_queryClient.getServerDate();
+            logger.info("Current date reported by Fedora is " 
+                    + DateUtility.convertDateToString(current));
+            return current;
+        } catch (IOException e) {
+            throw new RepositoryException("Error getting current date from Fedora", e);
         }
-        logger.info("Latest date of all records was " 
-                + DateUtility.convertDateToString(latest));
-        return latest;
     }
 
     /**
