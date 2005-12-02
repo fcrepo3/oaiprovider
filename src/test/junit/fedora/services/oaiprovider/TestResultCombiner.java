@@ -14,17 +14,50 @@ public class TestResultCombiner extends TestCase {
     }
 
     public void test1() throws Exception {
-
-        doTest(1);
+        doTest(1, true, true);
+        doTest(1, false, true);
+        doTest(1, true, false);
+        doTest(1, false, false);
     }
 
-    private void doTest(int n) throws Exception {
+    private void doTest(int n, 
+                        boolean includeSets, 
+                        boolean includeAbouts) throws Exception {
+
+        System.out.println("Running TestResultCombiner.doTest(" + n + ", " 
+                + includeSets + ", " + includeAbouts + ")");
 
         File f1 = new File("src/test/junit/combiner-test" + n + "-input1.csv");
-        File f2 = new File("src/test/junit/combiner-test" + n + "-input2.csv");
-        File f3 = new File("src/test/junit/combiner-test" + n + "-input3.csv");
-        File ex = new File("src/test/junit/combiner-test" + n + "-output.csv");
 
+        // don't use file 2 if this test doesn't include sets
+        File f2 = null;
+        if (includeSets) {
+            f2 = new File("src/test/junit/combiner-test" + n + "-input2.csv");
+        }
+
+        // don't use file 2 if this test doesn't include abouts
+        File f3 = null;
+        if (includeAbouts) {
+            f3 = new File("src/test/junit/combiner-test" + n + "-input3.csv");
+        }
+
+        // which file specifies the expected output for this test?
+        String suffix = "";
+        if (!includeSets) {
+            if (!includeAbouts) {
+                suffix = "4";
+            } else {
+                suffix = "2";
+            }
+        } else if (!includeAbouts) {
+            suffix = "3";
+        }
+
+        String outFilename = "combiner-test" + n + "-output" + suffix + ".csv";
+
+        File ex = new File("src/test/junit/" + outFilename);
+
+        // start combining, comparing actual output to expected output
         ResultCombiner combiner = new ResultCombiner(f1, f2, f3, false);
 
         BufferedReader expectedReader = new BufferedReader(
