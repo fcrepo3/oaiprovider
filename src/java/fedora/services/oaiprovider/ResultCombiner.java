@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
  *
  * The output is given one line at a time in the format below.  The header
  * is not actually provided, but is shown here for clarity.  Each item has
- * exactly one line with at least five comma-separated values.  And additional
+ * exactly one line with at least five comma-separated values.  An additional
  * value is provided for each set the item is a member of.
  *
  * <pre>

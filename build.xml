@@ -105,7 +105,8 @@
       <sysproperty key="driver.fedora.setSpec.name" value="http://www.openarchives.org/OAI/2.0/setName"/>
       <sysproperty key="driver.fedora.setSpec.desc.dissType" value="info:fedora/*/SetInfo.xml"/>
       <sysproperty key="driver.fedora.queryFactory" value="fedora.services.oaiprovider.ITQLQueryFactory"/>
-      <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/>
+      <!-- <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/> -->
+      <test name="fedora.services.oaiprovider.TestResultCombiner"/>
     </junit>
   </target>
   <target name="prep"

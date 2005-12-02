@@ -1,18 +1,16 @@
 package fedora.services.oaiprovider;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.jrdf.graph.Literal;
+
 import org.trippi.TupleIterator;
+import org.trippi.RDFFormat;
 
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
+
 import fedora.client.FedoraClient;
 import fedora.common.Constants;
 import fedora.server.utilities.DateUtility;
@@ -74,13 +72,202 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         return new FedoraSetInfoIterator(m_fedora, tuples);
     }
     
-    public RemoteIterator listRecords(Date from, Date until, String mdPrefixDissType, 
-                                String mdPrefixAboutDissType, 
-                                boolean withContent) {
-        String query = getListRecordsQuery(from, until, mdPrefixDissType, 
-                                             mdPrefixAboutDissType, withContent);
-        TupleIterator tuples = getTuples(query);
-        return new FedoraRecordIterator(m_fedora, tuples);
+    public RemoteIterator listRecords(Date from, 
+                                      Date until, 
+                                      String dissTypeURI,
+                                      String aboutDissTypeURI,
+                                      boolean withContent) {
+
+        // Construct and get results of one to three queries, depending on conf
+
+        // Parse and conver the dates once -- they may be used in multiple 
+        // queries.  Note that they must be shifted by a millisecond because 
+        // the provided dates are inclusive, whereas ITQL date operators are 
+        // exclusive
+        String afterUTC = null;
+        if (from != null) {
+            Date afterDate = new Date(from.getTime() + 1);
+            afterUTC = DateUtility.convertDateToString(afterDate);
+        }
+
+        String beforeUTC = null;
+        if (until != null) {
+            Date beforeDate = new Date(until.getTime() + 1);
+            beforeUTC = DateUtility.convertDateToString(beforeDate);
+        }
+
+        // do primary query
+        String primaryQuery = getListRecordsPrimaryQuery(afterUTC,
+                                                         beforeUTC,
+                                                         dissTypeURI);
+        File primaryFile = getCSVResults(primaryQuery);
+
+        // do set membership query, if applicable
+        File setFile = null;
+        if (m_itemSetSpecPath != null) {  // need set membership info
+            String setQuery = getListRecordsSetMembershipQuery(afterUTC,
+                                                               beforeUTC,
+                                                               dissTypeURI);
+            setFile = getCSVResults(setQuery);
+        }
+
+        // do about query, if applicable
+        File aboutFile = null;
+        if (aboutDissTypeURI != null) { // need about info
+            String aboutQuery = getListRecordsAboutQuery(afterUTC,
+                                                         beforeUTC,
+                                                         dissTypeURI,
+                                                         aboutDissTypeURI);
+            aboutFile = getCSVResults(aboutQuery);
+        }
+
+        // Get a FedoraRecordIterator over the combined results
+        // that automatically cleans up the result files when closed
+
+        try {
+            ResultCombiner combiner = new ResultCombiner(primaryFile,
+                                                         setFile,
+                                                         aboutFile,
+                                                         true);
+            return new CombinerRecordIterator(m_fedora,
+                                              dissTypeURI,
+                                              aboutDissTypeURI,
+                                              combiner);
+        } catch (FileNotFoundException e) {
+            throw new RepositoryException("Programmer error?  Query result "
+                    + "file(s) not found!");
+        }
+    }
+
+    // FedoraOAIDriver.PROP_DELETED is an optional, object-level (as opposed
+    // to dissemination-level) property. If present, use it in place of
+    // Fedora state.
+    private String getStatePattern() {
+        if (m_deleted.equals("")) {
+            return "$recordDiss <" + MODEL.STATE + "> $state";
+        } else {
+            return "$item <" + m_deleted + "> $state";
+        }  
+    }
+
+    private void appendRecordDissTypePart(String dissTypeURI, StringBuffer out) {
+        out.append("and    $recordDiss     <" + VIEW.DISSEMINATION_TYPE + "> <" + dissTypeURI + ">\n");
+    }
+
+    private void appendDateParts(String afterUTC, 
+                                 String beforeUTC, 
+                                 boolean alwaysSelectDate,
+                                 StringBuffer out) {
+        if (afterUTC == null && beforeUTC == null && !alwaysSelectDate) {
+            // we don't have to select the date because 
+            // there are no date constraints and the query doesn't ask for it
+            return;
+        } else {
+            out.append("and    $recordDiss     <" + VIEW.LAST_MODIFIED_DATE + "> $date\n");
+        }
+
+        // date constraints are optional
+        if (afterUTC != null) {
+            out.append("and    $date           <" + TUCANA.AFTER + "> '" + afterUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
+        }
+        if (beforeUTC != null) {
+            out.append("and    $date           <" + TUCANA.BEFORE + "> '" + beforeUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
+        }
+    }
+
+    // ordering is required for the combiner to work
+    private void appendOrder(StringBuffer out) {
+        out.append("order  by $itemID asc");
+    }
+
+    // this is common for all listRecords queries
+    private void appendCommonFromWhereAnd(StringBuffer out) {
+        out.append("from   <#ri>\n");
+        out.append("where  $object         <" + m_oaiItemID + "> $itemID\n");
+        out.append("and    $object         <" + VIEW.DISSEMINATES + "> $recordDiss\n");
+    }
+
+    private String getListRecordsPrimaryQuery(String afterUTC,
+                                              String beforeUTC,
+                                              String dissTypeURI) {
+        StringBuffer out = new StringBuffer();
+
+        out.append("select $object $itemID $date $state\n");
+        appendCommonFromWhereAnd(out);
+        out.append("and    " + getStatePattern() + "\n");
+        appendRecordDissTypePart(dissTypeURI, out);
+        appendDateParts(afterUTC, beforeUTC, true, out);
+        appendOrder(out);
+
+        return out.toString();
+    }
+
+    private String getListRecordsSetMembershipQuery(String afterUTC,
+                                                    String beforeUTC,
+                                                    String dissTypeURI) {
+        StringBuffer out = new StringBuffer();
+
+        out.append("select $itemID $setSpec\n");
+        appendCommonFromWhereAnd(out);
+        appendRecordDissTypePart(dissTypeURI, out);
+        appendDateParts(afterUTC, beforeUTC, true, out);
+        out.append("and    " + m_itemSetSpecPath + "\n");
+        appendOrder(out);
+
+        return out.toString();
+    }
+
+    private String getListRecordsAboutQuery(String afterUTC,
+                                            String beforeUTC,
+                                            String dissTypeURI,
+                                            String aboutDissTypeURI) {
+        StringBuffer out = new StringBuffer();
+
+        out.append("select $itemID\n");
+        appendCommonFromWhereAnd(out);
+        appendRecordDissTypePart(dissTypeURI, out);
+        appendDateParts(afterUTC, beforeUTC, true, out);
+        out.append("and $item    <" + VIEW.DISSEMINATES + "> $aboutDiss\n");
+        out.append("and $aboutDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + aboutDissTypeURI + ">\n");
+        appendOrder(out);
+
+        return out.toString();
+    }
+
+    /**
+     * Get the results of the given itql tuple query as a temporary CSV file.
+     */
+    private File getCSVResults(String queryText) throws RepositoryException {
+
+    	logger.debug("getCSVResults() called with query:\n" + queryText);
+
+        Map parameters = new HashMap();
+        parameters.put("lang", QUERY_LANGUAGE);
+        parameters.put("query", queryText);
+
+        File tempFile = null;
+        OutputStream out = null;
+        try {
+            tempFile = File.createTempFile("oaiprovider-listrec-tuples", ".csv");
+            tempFile.deleteOnExit(); // just in case
+            out = new FileOutputStream(tempFile);
+        } catch (IOException e) {
+            throw new RepositoryException("Error creating temp query result file", e);
+        }
+
+        try {
+            TupleIterator tuples = m_queryClient.getTuples(parameters);
+            logger.info("Saving query results to disk...");
+            tuples.toStream(out, RDFFormat.CSV);
+            logger.info("Done saving query results");
+            return tempFile;
+        } catch (Exception e) {
+            tempFile.delete();
+            throw new RepositoryException("Error getting tuples from Fedora: " +
+                                          e.getMessage(), e);
+        } finally {
+            try { out.close(); } catch (Exception e) { }
+        }
     }
     
     /**
@@ -119,6 +306,8 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
      * @param withContent
      * @return the iTQL query for ListRecords
      */
+
+/*
     protected String getListRecordsQuery(Date from, Date until, 
                                       String mdPrefixDissType, 
                                       String mdPrefixAboutDissType, 
@@ -198,6 +387,8 @@ where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
         query.append("  order by $itemID asc\n");
         return query.toString();
     }
+
+*/
     
     protected String getListSetInfoQuery() {
         boolean setDesc = m_setSpecDescDissType != null && !m_setSpecDescDissType.equals("");
