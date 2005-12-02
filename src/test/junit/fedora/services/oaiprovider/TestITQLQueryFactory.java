@@ -16,33 +16,6 @@ public class TestITQLQueryFactory extends TestCase {
         junit.textui.TestRunner.run(TestITQLQueryFactory.class);
     }
     
-    public void testGetLatestRecordDateQuery() throws Exception {
-        Properties props = new Properties();
-        props.put(FedoraOAIDriver.PROP_ITEMID, "http://www.openarchives.org/OAI/2.0/itemID");
-        
-        ITQLQueryFactory iqf = new ITQLQueryFactory();
-        QueryFactory qf = (QueryFactory) iqf;
-        qf.init(null, null, props);
-        String query = iqf.getLatestRecordDateQuery();
-        
-        String q = "select $date\n" +
-                   "  subquery(\n" + 
-                   "    select $volatile\n" +
-                   "    from <#ri>\n" +
-                   "    where $x <http://www.openarchives.org/OAI/2.0/itemID> $y\n" +
-                   "      and $x <info:fedora/fedora-system:def/view#disseminates> $z\n" +
-                   "      and $z <info:fedora/fedora-system:def/view#isVolatile> $volatile\n" +
-                   "      and $volatile <http://tucana.org/tucana#is> 'true'\n" +
-                   "  )\n" +
-                   "from <#ri>\n" +
-                   "where $object <http://www.openarchives.org/OAI/2.0/itemID> $oaiItemID\n" +
-                   "  and $object <info:fedora/fedora-system:def/view#disseminates> $diss\n" +
-                   "  and $diss <info:fedora/fedora-system:def/view#lastModifiedDate> $date\n" +
-                   "  order by $date desc\n" +
-                   "  limit 1\n";
-        assertEquals(q, query);
-    }
-    
     public void testListRecordsQuery() throws Exception {
         Properties props = new Properties();
         props.put(FedoraOAIDriver.PROP_ITEMID, "http://www.openarchives.org/OAI/2.0/itemID");
