@@ -55,7 +55,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
      * Rather than querying for this information, which can be costly,
      * simply return the current date as reported by the remote Fedora server.
      * 
-     * @param fedoraMetadataFormats the list of all FedoraMetadataFormats
+     * @param formats iterator over all FedoraMetadataFormats
      * @return current date according to Fedora
      */
     public Date latestRecordDate(Iterator formats) throws RepositoryException {
@@ -68,63 +68,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
             throw new RepositoryException("Error getting current date from Fedora", e);
         }
     }
-
-    /**
-     * Query to find the latest-dated record of the format indicated by
-     * the given dissType, or return null if at least one of the matching
-     * records is volatile.
-     */
-    private Date latestRecordDate(String dissType) {
-        TupleIterator tuples = getTuples(getLatestRecordDateQuery(dissType));
-        try {
-            if (tuples.hasNext()) {
-                Map row = tuples.next();
-                if (m_volatile && row.get("volatile") != null && !row.get("volatile").equals("")) {
-                    // FIXME get current date from the repository
-                    return new Date();
-                } else {
-                    Literal dateLiteral = (Literal) row.get("date");
-                    if (dateLiteral == null) {
-                        throw new RepositoryException("A row was returned, but it did not contain a 'date' binding");
-                    }
-                    return DateUtility.parseDateAsUTC(dateLiteral.getLexicalForm());
-                }
-            } else {
-                return new Date(0); // no records found for this format.
-            }
-        } catch (Exception e) {
-            throw new RepositoryException("Error querying for latest changed record date: " + 
-                                          e.getMessage(), e);
-        } finally {
-            if (tuples != null) {
-                try { 
-                    tuples.close(); 
-                } catch (Exception e) { }
-            }
-        }
-    }
-
-    private String getLatestRecordDateQuery(String dissType) {
-        String query = "select $date\n" +
-                       "  subquery(\n" +
-                       "    select $volatile\n" +
-                       "    from <#ri>\n" +
-                       "    where $x <" + m_oaiItemID + "> $y\n" +
-                       "      and $x <" + VIEW.DISSEMINATES + "> $z\n" +
-                       "      and $z <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
-                       "      and $z <" + VIEW.IS_VOLATILE.uri + "> $volatile\n" +
-                       "      and $volatile <" + TUCANA.IS.uri + "> 'true'\n" +
-                       "  )\n" +
-                       "from <#ri>\n" +
-                       "where $object <" + m_oaiItemID + "> $oaiItemID\n" +
-                       "  and $object <" + VIEW.DISSEMINATES + "> $diss\n" +
-                       "  and $diss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + dissType + ">\n" +
-                       "  and $diss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n" +
-                       "  order by $date desc\n" +
-                       "  limit 1\n";
-        return query;
-    }
-
 
     public RemoteIterator listSetInfo() {
         TupleIterator tuples = getTuples(getListSetInfoQuery());
