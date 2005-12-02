@@ -104,7 +104,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
 
         // do set membership query, if applicable
         File setFile = null;
-        if (m_itemSetSpecPath != null) {  // need set membership info
+        if (m_itemSetSpecPath != null && m_itemSetSpecPath.length() > 0) {  // need set membership info
             String setQuery = getListRecordsSetMembershipQuery(afterUTC,
                                                                beforeUTC,
                                                                dissTypeURI);
@@ -113,7 +113,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
 
         // do about query, if applicable
         File aboutFile = null;
-        if (aboutDissTypeURI != null) { // need about info
+        if (aboutDissTypeURI != null && aboutDissTypeURI.length() > 0) { // need about info
             String aboutQuery = getListRecordsAboutQuery(afterUTC,
                                                          beforeUTC,
                                                          dissTypeURI,
@@ -183,8 +183,8 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     // this is common for all listRecords queries
     private void appendCommonFromWhereAnd(StringBuffer out) {
         out.append("from   <#ri>\n");
-        out.append("where  $object         <" + m_oaiItemID + "> $itemID\n");
-        out.append("and    $object         <" + VIEW.DISSEMINATES + "> $recordDiss\n");
+        out.append("where  $item           <" + m_oaiItemID + "> $itemID\n");
+        out.append("and    $item           <" + VIEW.DISSEMINATES + "> $recordDiss\n");
     }
 
     private String getListRecordsPrimaryQuery(String afterUTC,
@@ -192,7 +192,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                                               String dissTypeURI) {
         StringBuffer out = new StringBuffer();
 
-        out.append("select $object $itemID $date $state\n");
+        out.append("select $item $itemID $date $state\n");
         appendCommonFromWhereAnd(out);
         out.append("and    " + getStatePattern() + "\n");
         appendRecordDissTypePart(dissTypeURI, out);

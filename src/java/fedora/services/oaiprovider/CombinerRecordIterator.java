@@ -86,7 +86,7 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
                 throw new Exception("Expected at least 5 comma-separated values");
             }
 
-            String pid = parts[0];
+            String pid = parts[0].substring(12); // everything after info:fedora/
 
             itemID = parts[1];
 
