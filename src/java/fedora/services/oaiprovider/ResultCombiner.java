@@ -2,6 +2,8 @@ package fedora.services.oaiprovider;
 
 import java.io.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Combines three RDF query results into a single iterator that can be
  * used to construct FedoraRecord objects.
@@ -48,8 +50,13 @@ import java.io.*;
  * info:fedora/nsdl:2051858,oai:nsdl.org:nsdl:10059:nsdl:2051858,2005-09-20T12:50:01,info:fedora/fedora-system:def/model#Active,true,5101,set2
  * info:fedora/nsdl:2052376,oai:nsdl.org:nsdl:10059:nsdl:2052376,2005-09-20T12:50:02.23.123,info:fedora/fedora-system:def/model#Active,true,5101
  * </pre>
+ *
+ * @author cwilper@cs.cornell.edu
  */
 public class ResultCombiner {
+
+    private static final Logger logger =
+        Logger.getLogger(FedoraOAIDriver.class.getName());
 
     private File m_f1;
     private File m_f2;
@@ -66,6 +73,15 @@ public class ResultCombiner {
 
     private static final String _START = "START";
 
+    /**
+     * Initialize with BufferedReaders containing the input data.
+     *
+     * @param r1 The results of the first query.  Must be provided.
+     * @param r2 The results of the second query.  If given as null, output will
+     *           not contain set membership information.
+     * @param r3 The results of the thrid query.  If given as null, output will
+     *           always indicate that no "about" information exist for the item.
+     */
     public ResultCombiner(BufferedReader r1,
                           BufferedReader r2,
                           BufferedReader r3) {
@@ -76,6 +92,18 @@ public class ResultCombiner {
         m_l3 = _START;
     }
 
+    /**
+     * Initialize with Files containing the input data, optionally deleting
+     * them when the ResultCombiner is closed.
+     *
+     * @param f1 The results of the first query.  Must be provided.
+     * @param f2 The results of the second query.  If given as null, output will
+     *           not contain set membership information.
+     * @param f3 The results of the thrid query.  If given as null, output will
+     *           always indicate that no "about" information exist for the item.
+     * @param deleteOnClose Whether to delete all provided files when this
+     *                      ResultCombiner is closed.
+     */
     public ResultCombiner(File f1, 
                           File f2, 
                           File f3, 
@@ -84,11 +112,22 @@ public class ResultCombiner {
         m_f2 = f2;
         m_f3 = f3;
         m_deleteOnClose = deleteOnClose;
-        m_r1 = new BufferedReader(new InputStreamReader(new FileInputStream(m_f1)));
-        m_r2 = new BufferedReader(new InputStreamReader(new FileInputStream(m_f2)));
-        m_r3 = new BufferedReader(new InputStreamReader(new FileInputStream(m_f3)));
+        m_r1 = new BufferedReader(
+                   new InputStreamReader(
+                       new FileInputStream(m_f1)));
+        if (m_f2 != null) m_r2 = new BufferedReader(
+                                     new InputStreamReader(
+                                         new FileInputStream(m_f2)));
+        if (m_f3 != null) m_r3 = new BufferedReader(
+                                     new InputStreamReader(
+                                         new FileInputStream(m_f3)));
+        m_l2 = _START;
+        m_l3 = _START;
     }
 
+    /**
+     * Get the next line of output, or null if we've reached the end.
+     */
     public String readLine() {
         String l1 = nextLine(m_r1);
         if (l1 == null) {
@@ -104,7 +143,9 @@ public class ResultCombiner {
         }
     }
 
+    // tell whether this item has an about dissemination
     private boolean hasAbout(String itemID) {
+        if (m_r3 == null) return false;
         if (m_l3 == _START) {
             m_l3 = nextLine(m_r3);
         }
@@ -120,7 +161,9 @@ public class ResultCombiner {
         }
     }
 
+    // get comma-separated setSpecs for this item, or the empty string if none
     private String setSpecs(String itemID) {
+        if (m_r2 == null) return "";
         if (m_l2 == _START) {
             m_l2 = nextLine(m_r2);
         }
@@ -156,17 +199,24 @@ public class ResultCombiner {
         }
     }
 
+    /**
+     * Close the input readers and delete the associated files if the
+     * combiner was constructed with the option to do so.
+     */
     public void close() {
         try { m_r1.close(); } catch (Throwable th) { }
         try { m_r2.close(); } catch (Throwable th) { }
         try { m_r3.close(); } catch (Throwable th) { }
         if (m_deleteOnClose) {
             m_f1.delete();
-            m_f2.delete();
-            m_f3.delete();
+            if (m_f2 != null) m_f2.delete();
+            if (m_f3 != null) m_f3.delete();
         }
     }
 
+    /**
+     * A simple command-line test of this class.  Give it three filenames.
+     */
     public static void main(String[] args) throws Exception {
         if (args.length == 3) {
             ResultCombiner c = new ResultCombiner(new BufferedReader(new InputStreamReader(new FileInputStream(new File(args[0])))),
