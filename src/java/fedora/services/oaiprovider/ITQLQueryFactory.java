@@ -71,6 +71,25 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         TupleIterator tuples = getTuples(getListSetInfoQuery());
         return new FedoraSetInfoIterator(m_fedora, tuples);
     }
+
+    /**
+     * Convert the given Date to a String while also adding or subtracting
+     * a millisecond.  The shift is necessary because the provided dates
+     * are inclusive, whereas ITQL date operators are exclusive.
+     */
+    protected String getExclusiveDateString(Date date, boolean isUntilDate) {
+        if (date == null) {
+            return null;
+        } else {
+            long time = date.getTime();
+            if (isUntilDate) {
+                time++; // add 1ms to make "until" -> "before"
+            } else {
+                time--; // sub 1ms to make "from"  -> "after"
+            }
+            return DateUtility.convertDateToString(new Date(time));
+        }
+    }
     
     public RemoteIterator listRecords(Date from, 
                                       Date until, 
@@ -80,21 +99,9 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
 
         // Construct and get results of one to three queries, depending on conf
 
-        // Parse and conver the dates once -- they may be used in multiple 
-        // queries.  Note that they must be shifted by a millisecond because 
-        // the provided dates are inclusive, whereas ITQL date operators are 
-        // exclusive
-        String afterUTC = null;
-        if (from != null) {
-            Date afterDate = new Date(from.getTime() - 1);
-            afterUTC = DateUtility.convertDateToString(afterDate);
-        }
-
-        String beforeUTC = null;
-        if (until != null) {
-            Date beforeDate = new Date(until.getTime() + 1);
-            beforeUTC = DateUtility.convertDateToString(beforeDate);
-        }
+        // Parse and convert the dates once; they may be used more than once
+        String afterUTC = getExclusiveDateString(from, false);
+        String beforeUTC = getExclusiveDateString(until, true);
 
         // do primary query
         String primaryQuery = getListRecordsPrimaryQuery(afterUTC,
@@ -187,7 +194,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         out.append("and    $item           <" + VIEW.DISSEMINATES + "> $recordDiss\n");
     }
 
-    private String getListRecordsPrimaryQuery(String afterUTC,
+    protected String getListRecordsPrimaryQuery(String afterUTC,
                                               String beforeUTC,
                                               String dissTypeURI) {
         StringBuffer out = new StringBuffer();
@@ -202,7 +209,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         return out.toString();
     }
 
-    private String getListRecordsSetMembershipQuery(String afterUTC,
+    protected String getListRecordsSetMembershipQuery(String afterUTC,
                                                     String beforeUTC,
                                                     String dissTypeURI) {
         StringBuffer out = new StringBuffer();
@@ -217,7 +224,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         return out.toString();
     }
 
-    private String getListRecordsAboutQuery(String afterUTC,
+    protected String getListRecordsAboutQuery(String afterUTC,
                                             String beforeUTC,
                                             String dissTypeURI,
                                             String aboutDissTypeURI) {

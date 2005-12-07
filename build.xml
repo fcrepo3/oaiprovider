@@ -107,6 +107,7 @@
       <sysproperty key="driver.fedora.queryFactory" value="fedora.services.oaiprovider.ITQLQueryFactory"/>
       <!-- <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/> -->
       <test name="fedora.services.oaiprovider.TestResultCombiner"/>
+      <test name="fedora.services.oaiprovider.TestITQLQueryFactory"/>
     </junit>
   </target>
   <target name="prep"
