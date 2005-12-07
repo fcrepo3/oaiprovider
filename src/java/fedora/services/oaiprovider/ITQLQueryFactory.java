@@ -86,7 +86,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         // exclusive
         String afterUTC = null;
         if (from != null) {
-            Date afterDate = new Date(from.getTime() + 1);
+            Date afterDate = new Date(from.getTime() - 1);
             afterUTC = DateUtility.convertDateToString(afterDate);
         }
 
@@ -144,9 +144,9 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     // Fedora state.
     private String getStatePattern() {
         if (m_deleted.equals("")) {
-            return "$recordDiss <" + MODEL.STATE + "> $state";
+            return "$recordDiss     <" + MODEL.STATE + "> $state";
         } else {
-            return "$item <" + m_deleted + "> $state";
+            return "$item           <" + m_deleted + "> $state";
         }  
     }
 
@@ -227,8 +227,8 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         appendCommonFromWhereAnd(out);
         appendRecordDissTypePart(dissTypeURI, out);
         appendDateParts(afterUTC, beforeUTC, true, out);
-        out.append("and $item    <" + VIEW.DISSEMINATES + "> $aboutDiss\n");
-        out.append("and $aboutDiss <" + VIEW.DISSEMINATION_TYPE + "> <" + aboutDissTypeURI + ">\n");
+        out.append("and    $item           <" + VIEW.DISSEMINATES + "> $aboutDiss\n");
+        out.append("and    $aboutDiss      <" + VIEW.DISSEMINATION_TYPE + "> <" + aboutDissTypeURI + ">\n");
         appendOrder(out);
 
         return out.toString();
@@ -269,126 +269,6 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
             try { out.close(); } catch (Exception e) { }
         }
     }
-    
-    /**
-     * Builds the iTQL query for record listings.
-     * 
-     * <pre>
-select $itemID $recordDiss $date $deleted
-  subquery(
-    select $setSpec
-    from &lt;#ri&gt;
-    where $setSpec &lt;x:x&gt; &lt;x:x&gt;
-  )
-  subquery(
-    select $aboutDiss
-    from &lt;#ri&gt;
-    where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
-      and $item &lt;fedora-view:disseminates&gt; $recordDiss
-      and $recordDiss &lt;fedora-view:disseminationType&gt; &lt;info:fedora&#8260;*&#8260;oai_dc&gt;
-      and $item &lt;fedora-view:disseminates&gt; $aboutDiss
-      and $aboutDiss &lt;fedora-view:disseminationType&gt; &lt;info:fedora&#8260;*&#8260;about_oai_dc&gt;
-  )
-
-from &lt;#ri&gt;
-where $item &lt;http://www.openarchives.org/OAI/2.0/itemID&gt; $itemID
-  and $item &lt;fedora-view:disseminates&gt; $recordDiss
-  and $recordDiss &lt;fedora-view:lastModifiedDate&gt; $date
-  and $recordDiss &lt;fedora-model:state&gt; $deleted
-  and $recordDiss &lt;fedora-view:disseminationType&gt; &lt;info:fedora&#8260;*&#8260;oai_dc&gt;
-  order by $itemID asc;
-     * </pre>
-     * 
-     * @param from
-     * @param until
-     * @param mdPrefixDissType
-     * @param mdPrefixAboutDissType
-     * @param withContent
-     * @return the iTQL query for ListRecords
-     */
-
-/*
-    protected String getListRecordsQuery(Date from, Date until, 
-                                      String mdPrefixDissType, 
-                                      String mdPrefixAboutDissType, 
-                                      boolean withContent) {
-        boolean set = !m_setSpec.equals("");
-        boolean about = mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("");
-        StringBuffer query = new StringBuffer();
-        query.append("select $item $recordDissType $itemID $date $deleted\n" +
-                     "  subquery(\n" +
-                     "    select $setSpec\n " +
-                     "    from <#ri>\n" +
-                     "    where\n");
-        if (set) {
-            query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
-                         "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
-                         "      and " + m_itemSetSpecPath + "\n");
-        } else {
-            // we don't want to match anything
-            query.append("      $setSpec <test:noMatch> <test:noMatch>\n");
-        }
-        query.append("  )\n");
-        
-        query.append("  subquery(\n" +
-                     "    select $aboutDissType\n" +
-                     "    from <#ri>\n" +
-                     "    where\n");
-        if (about) {
-            query.append("      $item <" + m_oaiItemID + "> $itemID\n" +
-                         "      and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
-                         "      and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> <" + mdPrefixDissType + ">\n" +
-                         "      and $item <" + VIEW.DISSEMINATES + "> $aboutDiss\n" +
-                         "      and $aboutDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $aboutDissType\n" +
-						 "      and $aboutDissType <" + TUCANA.IS.uri + "> <" + mdPrefixAboutDissType + ">");
-        } else {
-            // we don't want to match anything
-            query.append("      $aboutDissType <test:noMatch> <test:noMatch>");
-        }
-        query.append(")\n");
-
-        query.append("from <#ri>\n" +
-                      "where\n" +
-                      "  $item <" + m_oaiItemID + "> $itemID\n" +
-                      "  and $item <" + VIEW.DISSEMINATES + "> $recordDiss\n" +
-                      "  and $recordDiss <" + VIEW.DISSEMINATION_TYPE.uri + "> $recordDissType\n" +
-                      "  and $recordDissType <" + TUCANA.IS.uri + "> <" + mdPrefixDissType + ">\n" +
-                      "  and $recordDiss <" + VIEW.LAST_MODIFIED_DATE.uri + "> $date\n");
-        
-        // FedoraOAIDriver.PROP_DELETED is an optional, object-level (as opposed
-        // to dissemination-level) property. If present, use it in place of
-        // Fedora state.
-        if (m_deleted.equals("")) {
-            query.append("  and $recordDiss <" + MODEL.STATE + "> $deleted\n");
-        } else {
-            query.append("  and $item <" + m_deleted + "> $deleted\n");
-        }     
-        
-        // From and until dates are optional
-        // OAI from/until dates are inclusive boundaries.
-        // iTQL before/after are exclusive
-        if (from != null) {
-            // decrement date by 1 millisecond
-            from.setTime(from.getTime() - 1);
-            
-            query.append("  and $date <" + TUCANA.AFTER + "> '" + 
-                         DateUtility.convertDateToString(from) + 
-                         "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
-        }
-        if (until != null) {
-            // increment date by 1 millisecond
-            until.setTime(until.getTime() + 1);
-            query.append("  and $date <" + TUCANA.BEFORE + "> '" + 
-                         DateUtility.convertDateToString(until) + 
-                         "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
-        }
-        
-        query.append("  order by $itemID asc\n");
-        return query.toString();
-    }
-
-*/
     
     protected String getListSetInfoQuery() {
         boolean setDesc = m_setSpecDescDissType != null && !m_setSpecDescDissType.equals("");
