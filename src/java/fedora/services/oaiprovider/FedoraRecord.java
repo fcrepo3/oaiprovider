@@ -14,8 +14,16 @@ import fedora.client.FedoraClient;
 
 /**
  * @author Edwin Shin
+ * @author cwilper@cs.cornell.edu
  */
 public class FedoraRecord implements Record, Writable {
+
+    private static final String _DC_SCHEMALOCATION =
+            "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ "
+          + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd\"";
+    private static final String _XSI_DECLARATION = 
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
+
     private FedoraClient m_fedora;
     private String m_itemID;
     private String m_recordDiss;
@@ -84,8 +92,18 @@ public class FedoraRecord implements Record, Writable {
                 buf.append(line + "\n");
                 line = reader.readLine();
             }
+            String xml = buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
+            if ( (m_recordDiss.split("/").length == 3) 
+                    && (m_recordDiss.endsWith("/DC")) ) {
+                // If it's a DC datastream dissemination, inject the
+                // xsi:schemaLocation attribute
+                xml = xml.replaceAll("<oai_dc:dc ", 
+                                     "<oai_dc:dc " 
+                                     + _XSI_DECLARATION + " "
+                                     + _DC_SCHEMALOCATION + " ");
+            }
             out.println("  <metadata>");
-            out.print(buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", ""));
+            out.print(xml);
             out.println("  </metadata>");
         } catch (IOException e) {
             throw new RepositoryException("IO error reading " + m_recordDiss, e);
