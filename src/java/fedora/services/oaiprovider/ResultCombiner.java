@@ -215,6 +215,13 @@ public class ResultCombiner {
     }
 
     /**
+     * Ensure resources are freed up at garbage collection time.
+     */
+    protected void finalize() {
+        close();
+    }
+
+    /**
      * A simple command-line test of this class.  Give it three filenames.
      */
     public static void main(String[] args) throws Exception {

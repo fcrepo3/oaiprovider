@@ -15,7 +15,7 @@ import fedora.common.Constants;
 public class CombinerRecordIterator implements RemoteIterator, Constants {
 
     private static final Logger logger =
-        Logger.getLogger(FedoraOAIDriver.class.getName());
+        Logger.getLogger(CombinerRecordIterator.class.getName());
 
     private FedoraClient m_fedora;
     private String m_dissTypeURI;
@@ -50,10 +50,17 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
         }
     }
 
-    public void close() throws RepositoryException {
+    public void close() {
         m_combiner.close();
     }
 
+    /**
+     * Ensure resources are freed up at garbage collection time.
+     */
+    protected void finalize() {
+        close();
+    }
+    
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("CombinerRecordIterator does not support remove().");
     }
@@ -157,5 +164,5 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
         }
         return sb.toString();
     }
-    
+
 }
