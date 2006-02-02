@@ -307,6 +307,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
         Map parameters = new HashMap();
         parameters.put("lang", QUERY_LANGUAGE);
         parameters.put("query", query);
+        parameters.put("stream", "true"); // stream immediately from server
         
         try {
             return m_queryClient.getTuples(parameters);
