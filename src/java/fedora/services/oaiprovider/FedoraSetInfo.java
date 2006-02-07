@@ -6,9 +6,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import fedora.client.FedoraClient;
+import fedora.server.utilities.StreamUtility;
+
 import proai.SetInfo;
 import proai.error.RepositoryException;
-import fedora.client.FedoraClient;
 
 /**
  * SetInfo impl that includes setDescription elements for
@@ -39,7 +41,7 @@ public class FedoraSetInfo implements SetInfo {
     public void write(PrintWriter out) throws RepositoryException {
         out.println("<set>");
         out.println("  <setSpec>" + m_setSpec + "</setSpec>");
-        out.println("  <setName>" + m_setName + "</setName>");
+        out.println("  <setName>" + StreamUtility.enc(m_setName) + "</setName>");
         writeDescriptions(out);
         out.println("</set>");
     }
