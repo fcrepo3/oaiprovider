@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 import proai.Record;
-import proai.Writable;
 import proai.error.RepositoryException;
 import proai.error.ServerException;
 import fedora.client.FedoraClient;
@@ -16,7 +15,7 @@ import fedora.client.FedoraClient;
  * @author Edwin Shin
  * @author cwilper@cs.cornell.edu
  */
-public class FedoraRecord implements Record, Writable {
+public class FedoraRecord implements Record {
 
     private static final String _DC_SCHEMALOCATION =
             "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ "
@@ -26,26 +25,33 @@ public class FedoraRecord implements Record, Writable {
 
     private FedoraClient m_fedora;
     private String m_itemID;
-    private String m_recordDiss;
-    private String m_date;
-    private boolean m_deleted;
-    private String[] m_setSpecs;
-    private String m_aboutDiss;
+    private String m_mdPrefix;
+
+    private String m_sourceInfo;
     
     public FedoraRecord(FedoraClient fedora, 
                         String itemID, 
+                        String mdPrefix,
                         String recordDiss, 
                         String date, 
                         boolean deleted, 
                         String[] setSpecs, 
                         String aboutDiss) {
+
         m_fedora = fedora;
+
         m_itemID = itemID;
-        m_recordDiss = recordDiss;
-        m_date = date;
-        m_deleted = deleted;
-        m_setSpecs = setSpecs;
-        m_aboutDiss = aboutDiss;
+        m_mdPrefix = mdPrefix;
+
+        StringBuffer buf = new StringBuffer();
+        buf.append(recordDiss);
+        buf.append(" " + aboutDiss);
+        buf.append(" " + deleted);
+        buf.append(" " + date);
+        for (int i = 0; i < setSpecs.length; i++) {
+            buf.append(" " + setSpecs[i]);
+        }
+        m_sourceInfo = buf.toString();
     }
 
     /* (non-Javadoc)
@@ -54,7 +60,16 @@ public class FedoraRecord implements Record, Writable {
     public String getItemID() {
         return m_itemID;
     }
-    
+
+    public String getPrefix() {
+        return m_mdPrefix;
+    }
+
+    public String getSourceInfo() {
+        return m_sourceInfo;
+    }
+
+/*
     public void write(PrintWriter out) throws ServerException {
     	out.println("<record>");
         writeHeader(out);
@@ -139,6 +154,8 @@ public class FedoraRecord implements Record, Writable {
             if (in != null) try { in.close(); } catch (IOException e) { }
         }
     }
+
+    */
     
 
 /*

@@ -93,9 +93,9 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     
     public RemoteIterator listRecords(Date from, 
                                       Date until, 
+                                      String mdPrefix,
                                       String dissTypeURI,
-                                      String aboutDissTypeURI,
-                                      boolean withContent) {
+                                      String aboutDissTypeURI) {
 
         // Construct and get results of one to three queries, depending on conf
 
@@ -137,6 +137,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
                                                          aboutFile,
                                                          true);
             return new CombinerRecordIterator(m_fedora,
+                                              mdPrefix,
                                               dissTypeURI,
                                               aboutDissTypeURI,
                                               combiner);

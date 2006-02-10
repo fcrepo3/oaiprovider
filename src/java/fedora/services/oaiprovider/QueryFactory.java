@@ -40,12 +40,11 @@ public interface QueryFactory {
      * @param mdPrefixDissType      the dissemination type for a given metadata 
      *                              prefix.
      * @param mdPrefixAboutDissType
-     * @param withContent
      * @return                      a RemoteIterator of proai.Record objects
      */
     public RemoteIterator listRecords(Date from, 
                                       Date until, 
+                                      String mdPrefix,
                                       String mdPrefixDissType, 
-                                      String mdPrefixAboutDissType, 
-                                      boolean withContent);
+                                      String mdPrefixAboutDissType);
 }

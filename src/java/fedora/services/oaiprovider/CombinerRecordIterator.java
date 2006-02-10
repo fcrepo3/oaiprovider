@@ -18,6 +18,7 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
         Logger.getLogger(CombinerRecordIterator.class.getName());
 
     private FedoraClient m_fedora;
+    private String m_mdPrefix;
     private String m_dissTypeURI;
     private String m_aboutDissTypeURI;
     private ResultCombiner m_combiner;
@@ -28,10 +29,12 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
      * Initialize with combined record query results.
      */
     public CombinerRecordIterator(FedoraClient fedora, 
+                                  String mdPrefix,
                                   String dissTypeURI,
                                   String aboutDissTypeURI,
                                   ResultCombiner combiner) {
         m_fedora = fedora;
+        m_mdPrefix = mdPrefix;
         m_dissTypeURI = dissTypeURI;
         m_aboutDissTypeURI = aboutDissTypeURI;
         m_combiner = combiner;
@@ -123,6 +126,7 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
         // if we got here, all the parameters were parsed correctly
         return new FedoraRecord(m_fedora, 
                                 itemID, 
+                                m_mdPrefix,
                                 recordDissURI, 
                                 utcString,
                                 isDeleted, 

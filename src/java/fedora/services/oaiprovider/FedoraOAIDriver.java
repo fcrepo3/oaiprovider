@@ -1,16 +1,8 @@
 package fedora.services.oaiprovider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -27,6 +19,12 @@ import fedora.client.HttpInputStream;
  * @author Edwin Shin, cwilper@cs.cornell.edu
  */
 public class FedoraOAIDriver implements OAIDriver {
+
+    private static final String _DC_SCHEMALOCATION =
+            "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ "
+          + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd\"";
+    private static final String _XSI_DECLARATION = 
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
 
     private static final Logger logger =
             Logger.getLogger(FedoraOAIDriver.class.getName());
@@ -136,14 +134,128 @@ public class FedoraOAIDriver implements OAIDriver {
 
     public RemoteIterator listRecords(Date from, 
                                       Date until, 
-                                      String mdPrefix, 
-                                      boolean withContent) throws RepositoryException {
+                                      String mdPrefix) throws RepositoryException {
         if (from != null && until != null && from.after(until)) {
             throw new RepositoryException("from date cannot be later than until date.");
         }
         String mdPrefixDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getDissType();
         String mdPrefixAboutDissType = ((FedoraMetadataFormat)m_metadataFormats.get(mdPrefix)).getAbout();
-        return m_queryFactory.listRecords(from, until, mdPrefixDissType, mdPrefixAboutDissType, withContent);
+        return m_queryFactory.listRecords(from, 
+                                          until, 
+                                          mdPrefix,
+                                          mdPrefixDissType, 
+                                          mdPrefixAboutDissType);
+    }
+
+    public void writeRecordXML(String itemID,
+                               String mdPrefix,
+                               String sourceInfo,
+                               PrintWriter out) throws RepositoryException {
+
+        // Parse the sourceInfo string
+        String[] parts = sourceInfo.trim().split(" ");
+        if (parts.length < 4) {
+            throw new RepositoryException("Error parsing sourceInfo (expecting "
+                    + "4 or more parts): '" + sourceInfo + "'");
+        }
+        String dissURI = parts[0];
+        String aboutDissURI = parts[1];
+        boolean deleted = Boolean.getBoolean(parts[2]);
+        String date = parts[3];
+        List setSpecs = new ArrayList();
+        for (int i = 4; i < parts.length; i++) {
+            setSpecs.add(parts[i]);
+        }
+
+    	out.println("<record>");
+        writeRecordHeader(itemID, deleted, date, setSpecs, out); 
+        if (!deleted) {
+            writeRecordMetadata(dissURI, out);
+            if (!aboutDissURI.equals("null")) {
+                writeRecordAbouts(aboutDissURI, out);
+            }
+        }
+        out.println("</record>");
+    }
+
+    private static void writeRecordHeader(String itemID,
+                                          boolean deleted,
+                                          String date,
+                                          List setSpecs,
+                                          PrintWriter out) {
+        if (deleted) {
+            out.println("  <header status=\"deleted\">");
+        } else {
+            out.println("  <header>");
+        }
+        out.println("    <identifier>" + itemID + "</identifier>");
+        out.println("    <datestamp>" + date + "</datestamp>");
+        for (int i = 0; i < setSpecs.size(); i++) {
+            out.println("    <setSpec>" + (String) setSpecs.get(i) + "</setSpec>");
+        }
+        out.println("  </header>");
+    }
+
+    private void writeRecordMetadata(String dissURI, 
+                                     PrintWriter out) throws RepositoryException {
+
+        InputStream in = null;
+        try {
+            in = m_fedora.get(dissURI, true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer buf = new StringBuffer();
+            String line = reader.readLine();
+            while (line != null) {
+                buf.append(line + "\n");
+                line = reader.readLine();
+            }
+            String xml = buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
+            if ( (dissURI.split("/").length == 3) 
+                    && (dissURI.endsWith("/DC")) ) {
+                // If it's a DC datastream dissemination, inject the
+                // xsi:schemaLocation attribute
+                xml = xml.replaceAll("<oai_dc:dc ", 
+                                     "<oai_dc:dc " 
+                                     + _XSI_DECLARATION + " "
+                                     + _DC_SCHEMALOCATION + " ");
+            }
+            out.println("  <metadata>");
+            out.print(xml);
+            out.println("  </metadata>");
+        } catch (IOException e) {
+            throw new RepositoryException("IO error reading " + dissURI, e);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException e) { }
+        }
+    }
+
+    private void writeRecordAbouts(String aboutDissURI, 
+                                   PrintWriter out) throws RepositoryException {
+        String aboutWrapperStart = "<abouts>";
+        String aboutWrapperEnd = "</abouts>";
+        InputStream in = null;
+        try {        	
+            in = m_fedora.get(aboutDissURI, true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuffer buf = new StringBuffer();
+            String line = reader.readLine();
+            while (line != null) {
+                buf.append(line + "\n");
+                line = reader.readLine();
+            }
+            // strip xml declaration and leading whitespace
+            String xml = buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
+            int i = xml.indexOf(aboutWrapperStart);
+            if (i == -1) throw new RepositoryException("Bad abouts xml: opening " + aboutWrapperStart + " not found");
+            xml = xml.substring(i + aboutWrapperStart.length());
+            i = xml.lastIndexOf(aboutWrapperEnd);
+            if (i == -1) throw new RepositoryException("Bad abouts xml: closing " + aboutWrapperEnd + " not found");
+            out.print(xml.substring(0, i));
+        } catch (IOException e) {
+            throw new RepositoryException("IO error reading aboutDiss " + aboutDissURI, e);
+        } finally {
+            if (in != null) try { in.close(); } catch (IOException e) { }
+        }
     }
 
     public void close() throws RepositoryException {
