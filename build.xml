@@ -54,6 +54,16 @@
            classpathref="compiletests.path"
            optimize="${optimize}" debug="${debug}"/>
   </target>
+  <target name="testobjects"
+          depends="testclasses">
+    <java classname="fedora.services.oaiprovider.GenerateTestObjects">
+      <arg value="src/test/foxml"/>
+      <arg value="2500"/>
+      <classpath>
+        <pathelement location="build/testclasses"/>
+      </classpath>
+    </java>
+  </target>
   <target name="dist" 
           depends="classes" 
           description="Build the distribution in dist/">
