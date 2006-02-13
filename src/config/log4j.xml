@@ -4,9 +4,16 @@
         
   <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%p %d{mm:ss.SS} (%c{1}) %m%n"/>
+      <param name="ConversionPattern" value="%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{1}) %m%n"/>
     </layout>
   </appender>
+  
+	<appender name="LogFile" class="org.apache.log4j.FileAppender">
+		<param name="File" value="/tmp/proai.log"/>
+		<layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%p %d{yyyy-MM-dd' 'HH:mm:ss.SSS} [%t] (%c{1}) %m%n"/>
+		</layout>
+	</appender>
 
   <category name="fedora.services.oaiprovider">
     <priority value="DEBUG" />
@@ -26,7 +33,10 @@
 
   <root>
     <priority value="WARN" />
+    <appender-ref ref="LogFile"/>
+    <!--
     <appender-ref ref="STDOUT"/>
+    -->
   </root>
   
 </log4j:configuration>
