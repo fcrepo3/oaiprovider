@@ -85,6 +85,9 @@ public class FedoraOAIDriver implements OAIDriver {
                     + props.getProperty(PROP_IDENTIFY), e);
         }
 
+        // Signal that this app handles its own log4j configuration
+        FedoraClient.FORCE_LOG4J_CONFIGURATION = false;
+
         String className = getRequired(props, PROP_QUERY_FACTORY);
         try {
             m_fedora = new FedoraClient(m_fedoraBaseURL, m_fedoraUser, m_fedoraPass);
