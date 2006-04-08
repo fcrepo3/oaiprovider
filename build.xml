@@ -82,7 +82,7 @@
     </copy>
     <jar jarfile="dist/oaiprovider.war" basedir="build/webapp"/>
   </target>
-  <target name="doc"
+  <target name="javadoc"
           depends="prep"
 	      description="Build the documentation in dist/doc/api">
     <javadoc packagenames="fedora.services.oaiprovider.*"
@@ -92,8 +92,17 @@
            destdir="dist/doc/api"
            use="true"
            windowtitle="Fedora OAI Provider Javadocs">
-      <doctitle><![CDATA[<h1>Fedora OAI Provider Javadocs Javadocs</h1>]]></doctitle>
+      <doctitle><![CDATA[<h1>Fedora OAI Provider Javadocs</h1>]]></doctitle>
     </javadoc>
+  </target>
+  <target name="doc" depends="prep" description="Build the user docs in dist/doc">
+    <mkdir dir="dist/doc"/> 
+    <copy todir="dist/doc">
+      <fileset dir="src/doc"/>
+    </copy>
+    <java classpath="${lib.propstodocs}" classname="PropsToDocs" output="dist/doc/configuration.html">
+      <arg path="src/config/proai.properties"/>
+    </java>
   </target>
   <target name="test" description="Run tests" depends="testclasses">
     <!-- 
