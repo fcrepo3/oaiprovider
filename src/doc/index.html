@@ -1,0 +1,190 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<head>
+  <title>Fedora OAI Provider Service</title>
+  <link rel="stylesheet" type="text/css" href="docstyle.css" />
+</head>
+
+<body>
+
+<div id="header"> 
+  <a href="index.html" id="logo"></a>
+  <div id="title">
+    <h1>Fedora OAI Provider Service</h1>
+    <br />
+  </div>
+</div>
+
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <div class="tocbox">
+    <ol>
+      <li> <a href="#about">About This Service</a></li>
+      <li> <a href="#installation">Installation</a></li>
+      <li> <a href="#demo">Demonstration Setup</a></li>
+      <li> <a href="#configuration">Configuration</a></li>
+    </ol>
+  </div>
+</div>
+
+<div class="sec2">
+  <h2><a name="about">1. About This Service</a></h2>
+  <p>
+    The Fedora OAI Provider Service is part of the 
+    Fedora Service Framework and offers a vast improvement over the
+    previous, simple OAI provider that Fedora used in previous versions.
+    The new provider is based on <a href="http://www.sf.net/projects/proai/">Proai</a>, 
+    an open source caching, polling OAI provider. It has the following
+    features: 
+  </p>
+  <ul>
+    <li> 
+      Supports any metadata format available through your Fedora
+      repository via a datastream or dissemination.
+    </li>
+    <li> 
+      Supports sets that are expressed as RDF relationships in
+      your digital objects' RELS-EXT datastreams as exposed via the 
+      Resource Index.
+    </li>
+    <li> 
+      Runs as a webapp in any servlet container, acting as a web service
+      client to Fedora.
+    </li>
+    <li> 
+      Caches the content of the Fedora disseminations and
+      datastreams intended to be exposed as OAI records. This allows for fast
+      response times and ensures that the OAI provider can continue to
+      run <i>even when Fedora is temporarily stopped</i>.
+    </li>
+  </ul>
+</div>
+
+<div class="sec2">
+  <h2><a name="installation">2. Installation</a></h2>
+  <p>To install the service: </p>
+  <ol>
+    <li> 
+      Make sure you have a suitable database installed (MySQL,
+      Oracle, or McKoi) and a database user account that can 
+      create tables in the database.
+    </li>
+    <li> 
+      Make sure your Fedora repository is running with the
+      Resource Index turned ON. This is necessary because the 
+      oai provider periodically queries the resource index to 
+      discover which records of interest have changed.
+    </li>
+    <li> 
+      Deploy the oaiprovider.war file into your servlet
+      container.
+    </li>
+    <li> 
+      Configure the OAI provider as described in the
+      Configuration section below.
+    </li>
+    <li>
+      Re-start the webapp (this is often done by restarting 
+      the servlet container itself).
+    </li>
+  </ol>
+</div>
+
+<div class="sec2">
+  <h2><a name="demo">3. Demonstration / Test Setup</a></h2>
+  <p>
+    The source distribution of the OAI Provider Service includes several test
+    Fedora objects. You can use these objects and the default
+    proai.properties configuration file to quickly get an idea
+    for how the service works.
+  </p>
+  <ol>
+    <li>
+      Complete installation steps 1-4 above, using most
+      of the default values in the <code>proai.properties</code> configuration file, but
+      making sure that the following properties are set according to your own
+      Fedora installation:
+      <ul>
+        <li>driver.fedora.baseURL</li>
+        <li>driver.fedora.user</li>
+        <li>driver.fedora.pass</li>
+      </ul>
+    </li>
+    <li>
+      Make sure your Fedora installation is configured to retain
+      (rather than re-generate) PIDs of objects in the "demo" PID namespace
+      on ingest. You can check this in your fedora.fcfg file:
+      If one of the values of "retainPIDs" is "demo" or
+      "*" (asterisk), Fedora is configured correctly. Otherwise,
+      you should add this value and re-start Fedora.
+    </li>
+    <li>
+      Use the fedora-admin GUI or fedora-ingest command-line
+      utility to ingest all foxml objects in the src/test/foxml
+      directory of the Fedora OAI Provider source distribution.
+    </li>
+    <li>
+      Start the webapp.
+    </li>
+  </ol>
+  <p>
+    Upon starting, the service will poll Fedora for objects that
+    provide oai record content and have changed since its last update.
+    It will find the objects you just ingested, request
+    appropriate disseminations of each, and save them in its cache.
+    Once it has successfully completed a cache update cycle, you
+    should be able to hit the front-end (where you installed the service)
+    with OAI-PMH verbs. Here are a couple examples:
+  </p>
+  <div class="code"><pre>http://localhost/oaiprovider/?verb=Identify<br/>http://localhost/oaiprovider/?verb=ListRecords&amp;metadataPrefix=oai_dc</pre></div>
+  <p>
+    Now try using fedora-admin to edit one of the datastreams of one
+    of the demo objects you just ingested. The next time the
+    oaiprovider service polls Fedora for modified records,
+    it should pick up this change and make it available via the front-end.
+  </p>
+  <p>
+    Note that the poll frequency is ten minutes by default -- this can 
+    be configured to be more or less frequent by changing the 
+    <code>proai.driverPollSeconds</code> in the <code>proai.properties</code> 
+    file.
+  </p>
+</div>
+
+<div class="sec2">
+  <h2><a name="configuration">4. Configuration</a></h2>
+  <p>
+    Please consult the <a href="configuration.html">OAI Provider 
+    Configuration Reference</a> for a complete list of <code>proai.properties</code>
+    configuration options and what they do.
+  </p>
+  <p>
+    You should also take a look at the <code>log4j.xml</code> that
+    resides alongside the <code>proai.properties</code> file in
+    the webapp's <code>WEB-INF/classes</code> directory.  This file
+    controls where log messages will be sent and how much detail they
+    will contain.  When first setting up the OAI provider,
+    it is recommended that you keep the log level high (DEBUG for
+    most categories).
+  </p>
+</div>
+
+<div id="footer">
+<div id="copyright">Copyright &copy; 2006 Fedora
+Project </div>
+
+<div id="lastModified"> Last Modified
+<script type="text/javascript">
+//<![CDATA[
+var cvsDate = "$Date$";
+var parts = cvsDate.split(" ");
+var modifiedDate = parts[1];
+document.write(modifiedDate);
+//]]>
+</script>
+</div>
+
+</div>
+
+</body>
+</html>
