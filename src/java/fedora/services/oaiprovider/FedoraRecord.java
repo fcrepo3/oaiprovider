@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import org.apache.log4j.Logger;
+
 import proai.Record;
 import proai.error.RepositoryException;
 import proai.error.ServerException;
@@ -16,6 +18,8 @@ import fedora.client.FedoraClient;
  * @author cwilper@cs.cornell.edu
  */
 public class FedoraRecord implements Record {
+
+    public static Logger logger = Logger.getLogger(FedoraRecord.class.getName());
 
     private static final String _DC_SCHEMALOCATION =
             "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ "
@@ -66,6 +70,7 @@ public class FedoraRecord implements Record {
     }
 
     public String getSourceInfo() {
+        logger.debug("Returning source info line: " + m_sourceInfo);
         return m_sourceInfo;
     }
 

@@ -81,6 +81,8 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
      */
     private Record getRecord(String line) throws RepositoryException {
 
+        logger.debug("Constructing record from combined query result line: " + line);
+
         String[] parts = line.split(",");
 
         String itemID = null;

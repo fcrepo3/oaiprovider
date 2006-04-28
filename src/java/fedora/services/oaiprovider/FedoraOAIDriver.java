@@ -163,7 +163,7 @@ public class FedoraOAIDriver implements OAIDriver {
         }
         String dissURI = parts[0];
         String aboutDissURI = parts[1];
-        boolean deleted = Boolean.getBoolean(parts[2]);
+        boolean deleted = parts[2].equalsIgnoreCase("true");
         String date = parts[3];
         List setSpecs = new ArrayList();
         for (int i = 4; i < parts.length; i++) {
@@ -177,6 +177,8 @@ public class FedoraOAIDriver implements OAIDriver {
             if (!aboutDissURI.equals("null")) {
                 writeRecordAbouts(aboutDissURI, out);
             }
+        } else {
+            logger.info("Record was marked deleted: " + itemID + "/" + mdPrefix);
         }
         out.println("</record>");
     }
