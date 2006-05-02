@@ -30,14 +30,14 @@
         <all-data>
           <data format="x">
             <metadata>
-              <x:xMetadata xmlns:x="urn:example:formats:x" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:example:formats:x http://example.org/x.xsd">
+              <x:xMetadata xmlns:x="http://example.org/formatX/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/formatX/ http://example.org/formatX.xsd">
                 <x:name>Item Five</x:name>
                 <x:date>September, 2005</x:date>
               </x:xMetadata>
             </metadata>
             <abouts>
               <about>
-                <my_about xmlns="urn:example:formats:my-about" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:example:formats:my-about http://example.org/my-about.xsd">
+                <my_about xmlns="http://example.org/my-about/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/my-about/ http://example.org/my-about.xsd">
                   <category>item</category>
                   <firstCreated>2005-09-20T12:47:10.511</firstCreated>
                   <primaryIdentifier>http://example.org/item5.html</primaryIdentifier>
@@ -51,6 +51,7 @@
                     <dataSource public="true">http://example.org/oai</dataSource>
                     <identifier>oai:example.org:item5</identifier>
                     <datestamp>2004-03-02</datestamp>
+                    <metadataNamespace>http://example.org/formatX/</metadataNamespace>
                   </originDescription>
                 </provenance>
               </about>
@@ -58,14 +59,14 @@
           </data>
           <data format="y">
             <metadata>
-              <y:yMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="urn:example:formats:y" xsi:schemaLocation="urn:example:formats:y http://example.org/y.xsd">
+              <y:yMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://example.org/formatY/" xsi:schemaLocation="http://example.org/formatY/ http://example.org/formatY.xsd">
                 <y:label>Item Number Five</y:label>
                 <y:date>2005</y:date>
               </y:yMetadata>
             </metadata>
             <abouts>
               <about>
-                <my_about xmlns="urn:example:formats:my-about" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:example:formats:my-about http://example.org/my-about.xsd">
+                <my_about xmlns="http://example.org/my-about/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/my-about/ http://example.org/my-about.xsd">
                   <category>item</category>
                   <firstCreated>2005-09-20T12:47:10.511</firstCreated>
                   <primaryIdentifier>http://example.org/item5.html</primaryIdentifier>
@@ -79,6 +80,7 @@
                     <dataSource public="true">http://example.org/oai</dataSource>
                     <identifier>oai:example.org:item5</identifier>
                     <datestamp>2004-03-02</datestamp>
+                    <metadataNamespace>http://example.org/formatY/</metadataNamespace>
                   </originDescription>
                 </provenance>
               </about>

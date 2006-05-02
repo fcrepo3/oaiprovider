@@ -72,8 +72,8 @@
             </provenance>
           </about>
           <about>
-            <sample xmlns="http://example.org/sample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://example.org/sample http://example.org/sample.xsd">
+            <sample xmlns="http://example.org/sample/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://example.org/sample/ http://example.org/sample.xsd">
               <sample-element>text</sample-element>
             </sample>
           </about>

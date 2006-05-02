@@ -21,6 +21,7 @@
     <pathelement location="${lib.jaxrpc}"/>
     <pathelement location="${lib.proai}"/>
     <pathelement location="${lib.mysqljdbc}"/>
+    <pathelement location="${lib.bvalid}"/>
   </path>
   <path id="compile.path">
     <path refid="base.path"/>
