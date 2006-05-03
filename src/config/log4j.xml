@@ -29,7 +29,7 @@
 
   <!-- Category-specific settings -->
   <category name="fedora.services.oaiprovider">
-    <priority value="DEBUG" />
+    <priority value="INFO" />
   </category>
 
   <category name="fedora.client.FedoraClient">

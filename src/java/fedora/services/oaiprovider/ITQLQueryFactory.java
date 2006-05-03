@@ -247,7 +247,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
      */
     private File getCSVResults(String queryText) throws RepositoryException {
 
-    	logger.debug("getCSVResults() called with query:\n" + queryText);
+    	logger.info("getCSVResults() called with query:\n" + queryText);
 
         Map parameters = new HashMap();
         parameters.put("lang", QUERY_LANGUAGE);
@@ -303,8 +303,7 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
     
     private TupleIterator getTuples(String query) throws RepositoryException {
-    	logger.debug("getTuples() called with query: ");
-    	logger.debug(query);
+    	logger.info("getTuples() called with query:\n" + query);
         Map parameters = new HashMap();
         parameters.put("lang", QUERY_LANGUAGE);
         parameters.put("query", query);
