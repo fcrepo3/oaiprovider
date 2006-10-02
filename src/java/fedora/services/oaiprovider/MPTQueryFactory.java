@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -18,12 +19,18 @@ import org.apache.log4j.Logger;
 import org.nsdl.mptstore.core.BasicTableManager;
 import org.nsdl.mptstore.core.DDLGenerator;
 import org.nsdl.mptstore.core.TableManager;
-import org.nsdl.mptstore.query.GraphPattern;
-import org.nsdl.mptstore.query.GraphQuery;
-import org.nsdl.mptstore.query.GraphQuerySQLProvider;
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.TripleFilter;
-import org.nsdl.mptstore.query.TriplePattern;
+import org.nsdl.mptstore.query.component.BasicNodeFilter;
+import org.nsdl.mptstore.query.component.BasicNodePattern;
+import org.nsdl.mptstore.query.component.BasicTriplePattern;
+import org.nsdl.mptstore.query.component.GraphPattern;
+import org.nsdl.mptstore.query.component.GraphQuery;
+import org.nsdl.mptstore.query.component.NodeFilter;
+import org.nsdl.mptstore.query.component.NodePattern;
+import org.nsdl.mptstore.query.component.TriplePattern;
+import org.nsdl.mptstore.query.provider.GraphQuerySQLProvider;
+import org.nsdl.mptstore.util.NTriplesUtil;
+
 
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
@@ -85,9 +92,15 @@ public class MPTQueryFactory implements QueryFactory, Constants {
 	}
 
 	public Date latestRecordDate(Iterator fedoraMetadataFormats) {
-		String mods = 
-			adaptor.getTableFor("<info:fedora/fedora-system:def/view#lastModifiedDate>");
-		
+        
+		String mods; 
+        try {
+			mods = adaptor.getTableFor(
+                    NTriplesUtil.parsePredicate("<info:fedora/fedora-system:def/view#lastModifiedDate>"));
+        } catch (ParseException e) {
+            /* Should never get here :) */
+            throw new RuntimeException("Could not parse predicate ", e);
+        }
         logger.debug("getting latest record date");
 		String date;
         Connection c;
@@ -109,7 +122,7 @@ public class MPTQueryFactory implements QueryFactory, Constants {
 		 */
         
         logger.debug("given " + date);
-		if (date == null || !date.matches("\".+\"\\^\\^http://www.w3.org/2001/XMLSchema#dateTime")) {
+		if (date == null || !date.matches("\".+\"\\^\\^<http://www.w3.org/2001/XMLSchema#dateTime>")) {
             logger.debug("does not match expected format.  returning current time");
 			return new Date();
 		} else {
@@ -130,18 +143,22 @@ public class MPTQueryFactory implements QueryFactory, Constants {
         
 		GraphQuery query = new GraphQuery();
 		
-		/* First, build the core required part of the query */
-		GraphPattern requiredPath = new GraphPattern();
-		requiredPath.addTriplePattern(new TriplePattern("$item", "<" + this.itemID + ">",  "$itemID"));
-		requiredPath.addTriplePattern(new TriplePattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$recordDiss"));
-		requiredPath.addTriplePattern(new TriplePattern("$recordDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixDissType + ">"));
-		requiredPath.addTriplePattern(new TriplePattern("$recordDiss", "<info:fedora/fedora-system:def/view#lastModifiedDate>", "$date"));
-		requiredPath.addTriplePattern( new TriplePattern("$recordDiss", "<info:fedora/fedora-system:def/model#state>", "$state"));
+        GraphPattern requiredPath = new GraphPattern();
+        try {
+            /* First, build the core required part of the query */
+            requiredPath = new GraphPattern();
+            requiredPath.addTriplePattern(getPattern("$item", "<" + this.itemID + ">",  "$itemID"));
+            requiredPath.addTriplePattern(getPattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$recordDiss"));
+            requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixDissType + ">"));
+            requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/view#lastModifiedDate>", "$date"));
+            requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/model#state>", "$state"));
         
-		requiredPath.addFilter(new TripleFilter("$date", ">", DateUtility.convertDateToString(from)));
-		/* Note: We add a milisecond to the 'until', in order to assure that the comparison is inclusive */ 
-		requiredPath.addFilter(new TripleFilter("$date", "<", DateUtility.convertDateToString(new Date(until.getTime() + 1))));
-		
+            requiredPath.addFilter(getFilter("$date", ">", "\"" + DateUtility.convertDateToString(from) + "\""));
+            /* Note: We add a milisecond to the 'until', in order to assure that the comparison is inclusive */ 
+            requiredPath.addFilter(getFilter("$date", "<", "\"" + DateUtility.convertDateToString(until) + "\""));
+        } catch (ParseException e) {
+            throw new RepositoryException("Could not parse itemID", e);
+        }
         query.addRequired(requiredPath);
 		
 		/* Next, the setSpec, if asked for) */
@@ -151,9 +168,13 @@ public class MPTQueryFactory implements QueryFactory, Constants {
 		
 		/* Next, the about */
 		GraphPattern aboutPath = new GraphPattern();
-		aboutPath.addTriplePattern(new TriplePattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$aboutDiss"));
-		aboutPath.addTriplePattern(new TriplePattern("$aboutDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixAboutDissType + ">"));
-		query.addOptional(aboutPath);
+        try {
+            aboutPath.addTriplePattern(getPattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$aboutDiss"));
+            aboutPath.addTriplePattern(getPattern("$aboutDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixAboutDissType + ">"));
+        } catch (ParseException e) {
+            throw new RepositoryException("Could not parse metadata about dissemination type \n", e);
+        }
+        query.addOptional(aboutPath);
 		
         String[] targets = {"$item", "$itemID", "$date", "$state", "$setSpec", "$recordDiss", "$aboutDiss"};
         GraphQuerySQLProvider builder = new GraphQuerySQLProvider(adaptor, query);
@@ -161,7 +182,7 @@ public class MPTQueryFactory implements QueryFactory, Constants {
         builder.orderBy("$itemID", false);
         
         try {
-            logger.info("Build ListRecords query " + builder.getSQL());
+            logger.debug("Build ListRecords query " + builder.getSQL());
         } catch (QueryException e) {
             logger.error("Error building ListRecords query", e);
         }
@@ -174,14 +195,22 @@ public class MPTQueryFactory implements QueryFactory, Constants {
        
         /* First, the required bits */
         GraphPattern requiredPath = new GraphPattern();
-        requiredPath.addTriplePattern(new TriplePattern("$set", "<" + setSpec + ">", "$setSpec"));
-        requiredPath.addTriplePattern(new TriplePattern("$set", "<" + setName + ">", "$setName"));
+        try {
+            requiredPath.addTriplePattern(getPattern("$set", "<" + setSpec + ">", "$setSpec"));
+            requiredPath.addTriplePattern(getPattern("$set", "<" + setName + ">", "$setName"));
+        } catch (ParseException e) {
+            throw new RepositoryException("could not parse setSpec or setName\n", e);
+        }
         query.addRequired(requiredPath);
         
         /* Now, the optional dissemination */
         GraphPattern disseminationPath = new GraphPattern();
-        disseminationPath.addTriplePattern(new TriplePattern("$set", "<" + VIEW.DISSEMINATES + ">", "$setDiss"));
-        disseminationPath.addTriplePattern(new TriplePattern("$setDiss", "<" + VIEW.DISSEMINATION_TYPE.uri + ">", "<" + setSpecDissType + ">"));
+        try {
+            disseminationPath.addTriplePattern(getPattern("$set", "<" + VIEW.DISSEMINATES + ">", "$setDiss"));
+            disseminationPath.addTriplePattern(getPattern("$setDiss", "<" + VIEW.DISSEMINATION_TYPE.uri + ">", "<" + setSpecDissType + ">")); 
+        } catch (ParseException e) {
+            throw new RepositoryException("Could not parse set info dissemination path\n", e);
+        }
         query.addOptional(disseminationPath);
         
         String[] targets = {"$set", "$setSpec", "$setName", "$setDiss"};
@@ -189,7 +218,7 @@ public class MPTQueryFactory implements QueryFactory, Constants {
         builder.setTargets(Arrays.asList(targets));
         
         try {
-            logger.info("Build SetInfo query " + builder.getSQL());
+            logger.debug("Build SetInfo query " + builder.getSQL());
         } catch (QueryException e) {
             logger.error("Error building SetInfo query", e);
         }
@@ -263,10 +292,57 @@ public class MPTQueryFactory implements QueryFactory, Constants {
         }
         
         for (int i = 0; i < path.length; i+=3) {
-            logger.info("setSpec pattern: " + path[i] + " " + path[i+1] + " " +path[i+2] );
-        	setSpecPattern.addTriplePattern(new TriplePattern(path[i], path[i+1], path[i+2]));
+            logger.debug("setSpec pattern: " + path[i] + " " + path[i+1] + " " +path[i+2] );
+            try {
+                setSpecPattern.addTriplePattern(getPattern(path[i], path[i+1], path[i+2]));
+            } catch (ParseException e) {
+                throw new RepositoryException("Could not parse setSpec pattern");
+            }
         }
         
         return setSpecPattern;
 	}
+    
+    
+    
+    private static TriplePattern getPattern(String s , String p, String o) throws ParseException{
+        NodePattern subject;
+        NodePattern predicate;
+        NodePattern object;
+        
+        if (s.startsWith("$")) {
+            subject = new BasicNodePattern(s);
+        } else {
+            subject = new BasicNodePattern(NTriplesUtil.parseSubject(s));
+        }
+        
+        predicate = new BasicNodePattern(NTriplesUtil.parsePredicate(p));
+        
+        if (o.startsWith("$")) {
+            object = new BasicNodePattern(o);
+        } else {
+            object = new BasicNodePattern(NTriplesUtil.parseObject(o));
+        }
+        
+        return new BasicTriplePattern(subject, predicate, object);
+    }
+    
+    private static NodeFilter getFilter(String node, String operator, String value) throws ParseException {
+        NodePattern n;
+        NodePattern v;
+        
+        if (node.startsWith("$")) {
+            n = new BasicNodePattern(node);
+        } else {
+            n = new BasicNodePattern(NTriplesUtil.parseObject(node));
+        }
+        
+        if (value.startsWith("$")) {
+            v = new BasicNodePattern(value);
+        } else {
+            v = new BasicNodePattern(NTriplesUtil.parseObject(value));
+        }
+        
+        return new BasicNodeFilter(n, operator, v);
+    }
 }

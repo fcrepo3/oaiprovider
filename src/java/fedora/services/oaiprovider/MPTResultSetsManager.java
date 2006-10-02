@@ -7,8 +7,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.SQLProvider;
 import org.nsdl.mptstore.query.SQLUnionQueryResults;
+import org.nsdl.mptstore.query.provider.SQLProvider;
 
 
 public class MPTResultSetsManager {

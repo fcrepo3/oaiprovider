@@ -6,7 +6,8 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.SQLProvider;
+import org.nsdl.mptstore.query.provider.SQLProvider;
+import org.nsdl.mptstore.rdf.Node;
 
 import fedora.client.FedoraClient;
 
@@ -56,19 +57,23 @@ public class MPTSetInfoIterator implements RemoteIterator {
         try {
             if (results.hasNext()) {
                 List result = results.next();
-                String setSpec = (String) result.get(setSpecIndex);
-                if (setSpec != null) {
-                    setSpec = setSpec.replaceAll("\"", "");
+                String setSpec = null;
+                Node setSpecResult = ((Node) result.get(setSpecIndex));
+                if (setSpecResult != null) {
+                    setSpec = setSpecResult.getValue();
+                }
+               
+                String setName = null;
+                Node setNameResult = ((Node) result.get(setNameIndex));
+               
+                if (setNameResult != null) {
+                    setName = setNameResult.getValue();
                 }
                 
-                String setName = (String) result.get(setNameIndex);
-                if (setName != null) {
-                    setName = setName.replaceFirst("^\"", "").replaceFirst("\"$", "");
-                }
-                
-                String setDiss = (String) result.get(setDissIndex);
-                if (setDiss != null) {
-                    setDiss = setDiss.replaceFirst("^<", "").replaceFirst(">$", "");
+                String setDiss = null;
+                Node setDissResult = ((Node) result.get(setDissIndex));
+                if (setDissResult != null) {
+                    setDiss = setDissResult.getValue();
                 }
                 return new FedoraSetInfo(client, setSpec, setName, setDiss);
             } else {

@@ -10,7 +10,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.nsdl.mptstore.query.QueryException;
-import org.nsdl.mptstore.query.SQLProvider;
+import org.nsdl.mptstore.query.provider.SQLProvider;
+import org.nsdl.mptstore.rdf.Node;
 
 import fedora.client.FedoraClient;
 
@@ -89,11 +90,12 @@ public class MPTItemIterator implements RemoteIterator {
             if (results.hasNext()) {
                 List result = results.next();
                 
-                String pid = ((String) result.get(itemIndex)).replaceFirst("^<", "").replaceFirst(">$", "").replace("info:fedora/", "");
-                String itemID = ((String) result.get(itemIDIndex)).replaceFirst("^\"", "").replaceFirst("\"$", "");
+                String pid = (((Node) result.get(itemIndex))).getValue()
+                        .replace("info:fedora/", "");
+                String itemID = ((Node) result.get(itemIDIndex)).getValue();
                 
-                String date = formatDate((String) result.get(dateIndex));
-                boolean deleted = ((String) result.get(stateIndex)).equals(deletedState);
+                String date = formatDate(((Node) result.get(dateIndex)).toString());
+                boolean deleted = (((Node) result.get(stateIndex))).toString().equals(deletedState);
             
                 String recordDiss = this.recordDiss.replace("*", pid);
                 
@@ -108,16 +110,17 @@ public class MPTItemIterator implements RemoteIterator {
                  */
                 Set setSpecs = new HashSet();
                 if (setSpecIndex != -1) {
-                    String setSpec = (String) result.get(setSpecIndex);
-                    if (setSpec != null) {
-                        setSpecs.add((setSpec).replaceAll("\"", ""));
+                    Node setSpecResult = ((Node) result.get(setSpecIndex));
+                    if (setSpecResult != null) {
+                        setSpecs.add(setSpecResult.getValue());
                     }
                     if (results.peek() != null) {
-                        while (results.peek().get(itemIDIndex).equals(itemID)) {
+                        while (results.peek().get(itemIDIndex).toString().equals(itemID)) {
                             List nextEntry = results.next();
-                            setSpec = (String) nextEntry.get(setSpecIndex);
-                            if (setSpec != null) {
-                                setSpecs.add( (setSpec).replaceAll("\"", ""));
+                            setSpecResult = (Node) nextEntry.get(setSpecIndex);
+                         
+                            if (setSpecResult != null) {
+                                setSpecs.add(setSpecResult.getValue());
                             }
                             if (results.peek() == null) {break;}
                         }
@@ -157,11 +160,11 @@ public class MPTItemIterator implements RemoteIterator {
         
         if (!tripleDate.contains("http://www.w3.org/2001/XMLSchema#dateTime")) {
             throw new RepositoryException("Unknown date format, must be of form "+
-                    "'\"YYYY-MM-DDTHH:MM:SS.sss\"^^http://www.w3.org/2001/XMLSchema#dateTime" +
+                    "'\"YYYY-MM-DDTHH:MM:SS.sss\"^^<http://www.w3.org/2001/XMLSchema#dateTime>" +
                     " but instead was given " + tripleDate);
         }
         
-         return tripleDate.replace("\"", "").replace("^^http://www.w3.org/2001/XMLSchema#dateTime", "")
+         return tripleDate.replace("\"", "").replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "")
             .replaceFirst("\\.[0-9]+Z*", "") + "Z";
     }
 }
