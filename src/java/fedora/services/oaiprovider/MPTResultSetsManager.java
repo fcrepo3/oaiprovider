@@ -19,7 +19,7 @@ public class MPTResultSetsManager {
         try {
             Connection conn = dataSource.getConnection();
             conn.setAutoCommit(false);
-           this.results = new SQLUnionQueryResults(conn, 1000, sqlSource);
+           this.results = new SQLUnionQueryResults(conn, sqlSource, 1000, true);
            if (results.hasNext()) {
                this.nextResult = results.next();
            } else {
