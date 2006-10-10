@@ -153,9 +153,9 @@ public class MPTQueryFactory implements QueryFactory, Constants {
             requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/view#lastModifiedDate>", "$date"));
             requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/model#state>", "$state"));
         
-            requiredPath.addFilter(getFilter("$date", ">", "\"" + DateUtility.convertDateToString(from) + "\""));
+            requiredPath.addFilter(getFilter("$date", ">", "\"" + DateUtility.convertDateToString(new Date(from.getTime() - 1)) + "\""));
             /* Note: We add a milisecond to the 'until', in order to assure that the comparison is inclusive */ 
-            requiredPath.addFilter(getFilter("$date", "<", "\"" + DateUtility.convertDateToString(until) + "\""));
+            requiredPath.addFilter(getFilter("$date", "<", "\"" + DateUtility.convertDateToString(new Date(until.getTime() + 1)) + "\""));
         } catch (ParseException e) {
             throw new RepositoryException("Could not parse itemID", e);
         }
