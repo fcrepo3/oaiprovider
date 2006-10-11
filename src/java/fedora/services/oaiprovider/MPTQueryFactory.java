@@ -151,7 +151,17 @@ public class MPTQueryFactory implements QueryFactory, Constants {
             requiredPath.addTriplePattern(getPattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$recordDiss"));
             requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixDissType + ">"));
             requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/view#lastModifiedDate>", "$date"));
-            requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/model#state>", "$state"));
+            
+            /* If deletetedState isn't set, then use the default (i.e. per dissemination), else use
+             * the user-defined property at a per-object basis (i.e applies for *all* datastreams)
+             */
+            if (deletedState.equals("")) {
+                logger.debug("No explicit deleted state, so using state of dissemination..." );
+                requiredPath.addTriplePattern(getPattern("$recordDiss", "<info:fedora/fedora-system:def/model#state>", "$state"));
+            } else {
+                logger.debug("Explicit deleted state, so using state of object as " + deletedState + "..." );
+                requiredPath.addTriplePattern(getPattern("$item", "<" + deletedState + ">", "$state"));
+            }
         
             requiredPath.addFilter(getFilter("$date", ">", "\"" + DateUtility.convertDateToString(new Date(from.getTime() - 1)) + "\""));
             /* Note: We add a milisecond to the 'until', in order to assure that the comparison is inclusive */ 
@@ -186,7 +196,7 @@ public class MPTQueryFactory implements QueryFactory, Constants {
         } catch (QueryException e) {
             logger.error("Error building ListRecords query", e);
         }
-		return new MPTItemIterator(client, builder, dataSource, mdPrefix, deletedState, recordDiss, aboutDiss);
+		return new MPTItemIterator(client, builder, dataSource, mdPrefix, recordDiss, aboutDiss);
 	}
 
 	public RemoteIterator listSetInfo() {

@@ -14,11 +14,13 @@ import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.Node;
 
 import fedora.client.FedoraClient;
+import fedora.common.Constants;
 
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 
-public class MPTItemIterator implements RemoteIterator {
+
+public class MPTItemIterator implements RemoteIterator, Constants {
 
     private static final Logger logger =
         Logger.getLogger(MPTItemIterator.class.getName());
@@ -26,7 +28,6 @@ public class MPTItemIterator implements RemoteIterator {
     private final MPTResultSetsManager results;
     private final String mdPrefix;
     private final FedoraClient client;
-    private final String deletedState;
     
     private final int itemIndex;
     private final int itemIDIndex;
@@ -38,9 +39,8 @@ public class MPTItemIterator implements RemoteIterator {
     private final String recordDiss;
     private final String aboutDiss;
     
-    public MPTItemIterator(FedoraClient client, SQLProvider queryEngine, DataSource d, String prefix, String deletedState,
-            String recordDiss, String aboutDiss) {
-        this.deletedState = deletedState;
+    public MPTItemIterator(FedoraClient client, SQLProvider queryEngine, DataSource d, String prefix,
+            String recordDiss, String aboutDiss) {;
         this.client = client;
         this.mdPrefix = prefix;
         this.recordDiss = recordDiss;
@@ -95,8 +95,8 @@ public class MPTItemIterator implements RemoteIterator {
                 String itemID = ((Node) result.get(itemIDIndex)).getValue();
                 
                 String date = formatDate(((Node) result.get(dateIndex)).toString());
-                boolean deleted = (((Node) result.get(stateIndex))).toString().equals(deletedState);
-            
+                boolean deleted = !(((Node) result.get(stateIndex))).getValue().equals(MODEL.ACTIVE.uri);
+                
                 String recordDiss = this.recordDiss.replace("*", pid);
                 
                 String aboutDiss = "";
