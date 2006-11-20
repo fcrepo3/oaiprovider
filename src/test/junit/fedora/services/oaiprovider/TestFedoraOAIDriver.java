@@ -29,6 +29,19 @@ public class TestFedoraOAIDriver extends TestCase {
 
     //////////////////////////////////////////////////////////////////////////
 
+    public void testWriteRecordXMLDeleted() throws Exception {
+        StringWriter writer = new StringWriter();
+        m_impl.writeRecordXML("oai:myItemID",
+                              "xyz",
+                              "info:fedora/test:myItem/XYZ "
+                            + "info:fedora/test:myItem/aboutXYZ "
+                            + "true " // deleted
+                            + "2006-11-20T17:09:22Z "
+                            + "setSpec1 setSpec2",
+                              new PrintWriter(writer, true));
+        System.out.println("Result of writeRecordXML:\n" + writer.toString());
+    }
+
     public void testLatestDate() throws Exception {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         String latestDate = df.format(m_impl.getLatestDate());

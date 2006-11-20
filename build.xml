@@ -126,9 +126,16 @@
       <sysproperty key="driver.fedora.setSpec.name" value="http://www.openarchives.org/OAI/2.0/setName"/>
       <sysproperty key="driver.fedora.setSpec.desc.dissType" value="info:fedora/*/SetInfo.xml"/>
       <sysproperty key="driver.fedora.queryFactory" value="fedora.services.oaiprovider.ITQLQueryFactory"/>
-      <!-- <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/> -->
+      <sysproperty key="driver.fedora.itemSetSpecPath" value="$item &lt;urn:test&gt; $setSpec"/>
+      <sysproperty key="driver.fedora.queryConnectionTimeout" value="10000"/>
+      <sysproperty key="driver.fedora.querySocketTimeout" value="10000"/>
+      <sysproperty key="driver.fedora.disseminationConnectionTimeout" value="10000"/>
+      <sysproperty key="driver.fedora.disseminationSocketTimeout" value="10000"/>
+      <test name="fedora.services.oaiprovider.TestFedoraOAIDriver"/>
+<!--
       <test name="fedora.services.oaiprovider.TestResultCombiner"/>
       <test name="fedora.services.oaiprovider.TestITQLQueryFactory"/>
+-->
     </junit>
   </target>
   <target name="prep"
