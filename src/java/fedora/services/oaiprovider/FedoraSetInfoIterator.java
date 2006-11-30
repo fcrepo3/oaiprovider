@@ -29,6 +29,12 @@ public class FedoraSetInfoIterator implements RemoteIterator {
     private SetInfo m_next;
 
     /**
+     * Initialize empty.
+     */
+    public FedoraSetInfoIterator() {
+    }
+
+    /**
      * Initialize with tuples.
      *
      * The tuples should look like:
@@ -128,7 +134,9 @@ public class FedoraSetInfoIterator implements RemoteIterator {
 
     public void close() throws RepositoryException {
         try {
-            m_tuples.close();
+            if (m_tuples != null) {
+                m_tuples.close();
+            }
         } catch (TrippiException e) {
             throw new RepositoryException("Unable to close tuple iterator", e);
         }

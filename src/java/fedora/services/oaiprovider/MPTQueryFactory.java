@@ -200,6 +200,11 @@ public class MPTQueryFactory implements QueryFactory, Constants {
 	}
 
 	public RemoteIterator listSetInfo() {
+
+        if (this.setSpecPath == null) {
+            // return empty iterator if sets not configured
+            return new FedoraSetInfoIterator();
+        }
         
         GraphQuery query = new GraphQuery();
        

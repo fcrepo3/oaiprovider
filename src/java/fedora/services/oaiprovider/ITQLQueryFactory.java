@@ -68,8 +68,13 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
     }
 
     public RemoteIterator listSetInfo() {
-        TupleIterator tuples = getTuples(getListSetInfoQuery());
-        return new FedoraSetInfoIterator(m_fedora, tuples);
+        if (m_itemSetSpecPath == null) {
+            // return empty iterator if sets not configured
+            return new FedoraSetInfoIterator();
+        } else {
+            TupleIterator tuples = getTuples(getListSetInfoQuery());
+            return new FedoraSetInfoIterator(m_fedora, tuples);
+        }
     }
 
     /**
