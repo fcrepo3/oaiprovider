@@ -7,11 +7,14 @@
     <pathelement location="${lib.xmlpull}"/>
     <pathelement location="${lib.xpp}"/>
     <pathelement location="${lib.httpclient}"/>
+    <pathelement location="${lib.codec}"/>
     <pathelement location="${lib.logging}"/>
     <pathelement location="${lib.log4j}"/>
     <pathelement location="${lib.xerces}"/>
     <pathelement location="${lib.xml-apis}"/>
     <pathelement location="${lib.axis}"/>
+    <pathelement location="${lib.activation}"/>
+    <pathelement location="${lib.wsdl4j}"/>
     <pathelement location="${lib.discovery}"/>
     <pathelement location="${lib.dbcp}"/>
     <pathelement location="${lib.collections}"/>
@@ -21,6 +24,7 @@
     <pathelement location="${lib.jaxrpc}"/>
     <pathelement location="${lib.proai}"/>
     <pathelement location="${lib.mysqljdbc}"/>
+    <pathelement location="${lib.postgresjdbc}"/>
     <pathelement location="${lib.bvalid}"/>
   	<pathelement location="${lib.mptstore}"/>
   </path>
