@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="oaiprovider" default="dist" basedir=".">
+
   <loadproperties srcFile="build.properties"/>
+
+  <property name="oaiprovider.version" value="1.1"/>
+
   <path id="base.path">
     <pathelement location="${lib.jrdf}"/>
     <pathelement location="${lib.trippi}"/>
@@ -28,18 +32,50 @@
     <pathelement location="${lib.bvalid}"/>
   	<pathelement location="${lib.mptstore}"/>
   </path>
+
   <path id="compile.path">
     <path refid="base.path"/>
     <pathelement location="${lib.junit}"/>
   </path>
+
   <path id="compiletests.path">
     <path refid="compile.path"/>
     <pathelement location="build/classes"/>
   </path>
+
   <path id="test.path">
     <path refid="compiletests.path"/>
     <pathelement location="build/testclasses"/>
   </path>
+
+  <target name="binrelease" depends="dist, doc">
+    <copy todir="dist/release/oaiprovider-${oaiprovider.version}">
+      <fileset dir="dist">
+        <exclude name="release/**"/>
+      </fileset>
+    </copy>
+    <zip zipfile="dist/release/oaiprovider-${oaiprovider.version}.zip" basedir="dist/release" includes="oaiprovider-${oaiprovider.version}/**"/>
+    <delete dir="dist/release/oaiprovider-${oaiprovider.version}"/>
+  </target>
+
+  <target name="srcrelease" depends="clean">
+    <copy todir="dist/release/oaiprovider-${oaiprovider.version}-src">
+      <fileset dir=".">
+        <exclude name="dist/**"/>
+      </fileset>
+    </copy>
+    <zip zipfile="dist/release/oaiprovider-${oaiprovider.version}-src.zip" basedir="dist/release" includes="oaiprovider-${oaiprovider.version}-src/**"/>
+    <delete dir="dist/release/oaiprovider-${oaiprovider.version}-src"/>
+  </target>
+
+  <target name="release" depends="srcrelease,binrelease" description="Build the source and binary distributions in dist/release">
+    <checksum fileext=".md5">
+      <fileset dir="dist/release">
+        <include name="*.zip"/>
+      </fileset>
+    </checksum>
+  </target>
+
   <target name="classes" 
           depends="prep"
           description="build all java classes into build/">
@@ -52,6 +88,7 @@
       <fileset dir="src/config"/>
     </copy>
   </target>
+
   <target name="testclasses"
           depends="classes">
     <mkdir dir="build/testclasses"/>
@@ -60,6 +97,7 @@
            classpathref="compiletests.path"
            optimize="${optimize}" debug="${debug}"/>
   </target>
+
   <target name="testobjects"
           depends="testclasses">
     <java classname="fedora.services.oaiprovider.GenerateTestObjects">
@@ -70,6 +108,7 @@
       </classpath>
     </java>
   </target>
+
   <target name="dist" 
           depends="classes" 
           description="Build the distribution in dist/">
@@ -88,6 +127,7 @@
     </copy>
     <jar jarfile="dist/oaiprovider.war" basedir="build/webapp"/>
   </target>
+
   <target name="javadoc"
           depends="prep"
 	      description="Build the documentation in dist/doc/api">
@@ -101,6 +141,7 @@
       <doctitle><![CDATA[<h1>Fedora OAI Provider Javadocs</h1>]]></doctitle>
     </javadoc>
   </target>
+
   <target name="doc" depends="prep" description="Build the user docs in dist/doc">
     <mkdir dir="dist/doc"/> 
     <copy todir="dist/doc">
@@ -110,6 +151,7 @@
       <arg path="src/config/proai.properties"/>
     </java>
   </target>
+
   <target name="test" description="Run tests" depends="testclasses">
     <!-- 
       For this task to run, prior to running ant, set CLASSPATH=lib\junit.jar
@@ -142,11 +184,13 @@
 -->
     </junit>
   </target>
+
   <target name="prep"
           description="prepare for a build">
     <mkdir dir="build"/>
     <mkdir dir="dist"/>
   </target>
+
   <target name="clean"
           description="remove all build-generated stuff">
       <delete dir="build"/>
