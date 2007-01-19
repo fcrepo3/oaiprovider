@@ -8,10 +8,10 @@
 <body>
 
 <div id="header"> 
-  <a href="index.html" id="logo"></a>
+  <a href="http://www.fedora.info/download/2.2/userdocs/index.html" id="logo"></a>
   <div id="title">
     <h1>Fedora OAI Provider Service</h1>
-    <br />
+    <h2>For Fedora Version 2.2</h2>
   </div>
 </div>
 
@@ -27,13 +27,15 @@
   </div>
 </div>
 
+<p>&nbsp;</p>
+
 <div class="sec2">
   <h2><a name="about">1. About This Service</a></h2>
   <p>
     The Fedora OAI Provider Service is part of the 
     Fedora Service Framework and offers a vast improvement over the
     previous, simple OAI provider that Fedora used in previous versions.
-    The new provider is based on <a href="http://www.sf.net/projects/proai/">Proai</a>, 
+    The new provider is based on <a href="http://proai.sourceforge.net/">Proai</a>, 
     an open source caching, polling OAI provider. It has the following
     features: 
   </p>
@@ -58,14 +60,32 @@
       run <i>even when Fedora is temporarily stopped</i>.
     </li>
   </ul>
+  <p><b>NEW FEATURES:</b>
+    This release of the OAI Provider incorportates the following new features:
+    <ul>
+      <li> <i>Automatic schema validation.</i><br/>
+           Incoming record XML can now be automatically validated and
+           rejected if it doesn't conform to the XML schema it declares.</li>
+      <li> <i>Support for MPTStore</i><br/>
+           As of release 2.2, Fedora now supports an alternate triplestore,
+           <a href="http://mptstore.sourceforge.net">MPTStore</a>, for
+           the <a href="http://www.fedora.info/download/2.2/userdocs/server/resourceIndex/index.html">Resource Index</a>.  The OAI Provider service has been modified
+           to support this configuration option.  It can now be used whether
+           the RI is backed by Kowari or MPTStore.
+    </ul>
+    See the <a href="configuration.html">Configuration Reference</a> for
+    more detail on using these new capabilities.
+  </p>
 </div>
+
+<p>&nbsp;</p>
 
 <div class="sec2">
   <h2><a name="installation">2. Installation</a></h2>
   <p>To install the service: </p>
   <ol>
     <li> 
-      Make sure you have a suitable database installed (MySQL,
+      Make sure you have a suitable database installed (MySQL, PostgreSQL,
       Oracle, or McKoi) and a database user account that can 
       create tables in the database.
     </li>
@@ -89,6 +109,8 @@
     </li>
   </ol>
 </div>
+
+<p>&nbsp;</p>
 
 <div class="sec2">
   <h2><a name="demo">3. Demonstration / Test Setup</a></h2>
@@ -151,6 +173,8 @@
   </p>
 </div>
 
+<p>&nbsp;</p>
+
 <div class="sec2">
   <h2><a name="configuration">4. Configuration</a></h2>
   <p>
@@ -170,7 +194,7 @@
 </div>
 
 <div id="footer">
-<div id="copyright">Copyright &copy; 2006 Fedora
+<div id="copyright">Copyright &copy; 2006-2007 Fedora
 Project </div>
 
 <div id="lastModified"> Last Modified
