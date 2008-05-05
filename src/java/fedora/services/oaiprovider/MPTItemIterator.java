@@ -37,14 +37,14 @@ public class MPTItemIterator implements RemoteIterator, Constants {
     private final int dateIndex;
     private final int setSpecIndex;
     private final String recordDiss;
-    private final String aboutDiss;
+    private final String m_aboutDiss;
     
     public MPTItemIterator(FedoraClient client, SQLProvider queryEngine, DataSource d, String prefix,
             String recordDiss, String aboutDiss) {;
         this.client = client;
         this.mdPrefix = prefix;
         this.recordDiss = recordDiss;
-        this.aboutDiss = aboutDiss;
+        this.m_aboutDiss = aboutDiss;
         
         try {
             results = new MPTResultSetsManager(d, queryEngine);
@@ -99,9 +99,9 @@ public class MPTItemIterator implements RemoteIterator, Constants {
                 
                 String recordDiss = this.recordDiss.replace("*", pid);
                 
-                String aboutDiss = "";
+                String aboutDiss = "null";
                 if (aboutDissIndex != -1) {
-                    aboutDiss = this.aboutDiss.replace("*", pid);
+                    aboutDiss = m_aboutDiss.replace("*", pid);
                 } 
             
                 /* 

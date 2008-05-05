@@ -6,9 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -176,19 +178,24 @@ public class MPTQueryFactory implements QueryFactory, Constants {
 			query.addOptional(parseSetSpecPath(setSpecPath));
 		}
 		
-		/* Next, the about */
-		GraphPattern aboutPath = new GraphPattern();
-        try {
-            aboutPath.addTriplePattern(getPattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$aboutDiss"));
-            aboutPath.addTriplePattern(getPattern("$aboutDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixAboutDissType + ">"));
-        } catch (ParseException e) {
-            throw new RepositoryException("Could not parse metadata about dissemination type \n", e);
-        }
-        query.addOptional(aboutPath);
+		List<String> targets = new ArrayList<String>(Arrays.asList(
+	        "$item", "$itemID", "$date", "$state", "$setSpec", "$recordDiss"));
 		
-        String[] targets = {"$item", "$itemID", "$date", "$state", "$setSpec", "$recordDiss", "$aboutDiss"};
+		/* Next, the about */
+		if (mdPrefixAboutDissType != null && !mdPrefixAboutDissType.equals("")) {
+		    GraphPattern aboutPath = new GraphPattern();
+		    try {
+		        aboutPath.addTriplePattern(getPattern("$item", "<info:fedora/fedora-system:def/view#disseminates>", "$aboutDiss"));
+		        aboutPath.addTriplePattern(getPattern("$aboutDiss", "<info:fedora/fedora-system:def/view#disseminationType>", "<" + mdPrefixAboutDissType + ">"));
+		    } catch (ParseException e) {
+		        throw new RepositoryException("Could not parse metadata about dissemination type \n", e);
+		    }
+		    targets.add("$aboutDiss");
+		    query.addOptional(aboutPath);
+		}
+
         GraphQuerySQLProvider builder = new GraphQuerySQLProvider(adaptor, query);
-        builder.setTargets(Arrays.asList(targets));
+        builder.setTargets(targets);
         builder.orderBy("$itemID", false);
         
         try {
