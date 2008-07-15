@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="test:oaiprovider-object-identify"
+	VERSION="1.1" xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+	<foxml:objectProperties>
+		<foxml:property NAME="info:fedora/fedora-system:def/model#state"
+			VALUE="Active" />
+		<foxml:property NAME="info:fedora/fedora-system:def/model#label"
+			VALUE="oaiprovider identity" />
+		<foxml:property
+			NAME="info:fedora/fedora-system:def/model#ownerId"
+			VALUE="fedoraAdmin" />
+	</foxml:objectProperties>
+	<foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A"
+		VERSIONABLE="true">
+		<foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Metadata"
+			MIMETYPE="text/xml">
+			<foxml:contentDigest DIGEST="none" TYPE="DISABLED" />
+			<foxml:xmlContent>
+				<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+					xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+					<dc:title>oaiprovider identity</dc:title>
+					<dc:identifier>
+						test:oaiprovider-object-identify
+					</dc:identifier>
+				</oai_dc:dc>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="IDENTIFY" STATE="A"
+		VERSIONABLE="false">
+		<foxml:datastreamVersion ID="METADATA.0"
+			LABEL="oaiprovider test content" MIMETYPE="text/xml">
+			<foxml:contentDigest DIGEST="none" TYPE="DISABLED" />
+			<foxml:xmlContent>
+				<Identify>
+					<repositoryName>Test OAI Repository</repositoryName>
+					<baseURL>http://example.org/oai</baseURL>
+					<protocolVersion>2.0</protocolVersion>
+					<adminEmail>nobody@example.org</adminEmail>
+					<earliestDatestamp>
+						1970-01-01T00:00:00Z
+					</earliestDatestamp>
+					<deletedRecord>transient</deletedRecord>
+					<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+					<description>
+						<oai-identifier
+							xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+							xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+							xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+							<scheme>oai</scheme>
+							<repositoryIdentifier>
+								example.org
+							</repositoryIdentifier>
+							<delimiter>:</delimiter>
+							<sampleIdentifier>
+								oai:test:xyz
+							</sampleIdentifier>
+						</oai-identifier>
+					</description>
+				</Identify>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+	<foxml:datastream CONTROL_GROUP="X" ID="ABOUT" STATE="A"
+		VERSIONABLE="false">
+		<foxml:datastreamVersion ID="ABOUT.0"
+			LABEL="oaiprovider test content" MIMETYPE="text/xml">
+			<foxml:contentDigest DIGEST="none" TYPE="DISABLED" />
+			<foxml:xmlContent>
+				<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+					xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+					<dc:description>Test About Payload</dc:description>
+				</oai_dc:dc>
+			</foxml:xmlContent>
+		</foxml:datastreamVersion>
+	</foxml:datastream>
+</foxml:digitalObject>

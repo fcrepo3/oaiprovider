@@ -184,6 +184,15 @@
 -->
     </junit>
   </target>
+	
+	<target name="liveTests" description="Run all live system tests" depends="testclasses">
+	
+		<junit printsummary="yes" fork="yes" forkmode="once" haltonfailure="yes" showoutput="true">
+		<formatter type="plain" usefile="false"/> 
+		<classpath refid="test.path"/>
+			<test name="fedora.services.oaiprovider.AllLiveTests"/>
+		</junit>
+	</target>
 
   <target name="prep"
           description="prepare for a build">

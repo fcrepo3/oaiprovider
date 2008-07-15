@@ -1,3 +1,4 @@
+
 package fedora.services.oaiprovider;
 
 import java.sql.SQLException;
@@ -10,37 +11,66 @@ import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.Node;
 
 import fedora.client.FedoraClient;
+import fedora.common.PID;
 
+import proai.SetInfo;
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 
-public class MPTSetInfoIterator implements RemoteIterator {
+public class MPTSetInfoIterator
+        implements RemoteIterator<SetInfo> {
 
     private final FedoraClient client;
+
     private final MPTResultSetsManager results;
-    
+
+    private final int setObjectIndex;
+
     private final int setSpecIndex;
+
     private final int setNameIndex;
-    private final int setDissIndex;
-    
-    public MPTSetInfoIterator(FedoraClient client, SQLProvider queryEngine, DataSource d)  {
+
+    private final int dissTargetIndex;
+
+    private final InvocationSpec m_setInfoSpec;
+
+    public MPTSetInfoIterator(FedoraClient client,
+                              SQLProvider queryEngine,
+                              DataSource d,
+                              String disseminationTarget,
+                              InvocationSpec setInfoSpec) {
         this.client = client;
         try {
             results = new MPTResultSetsManager(d, queryEngine);
         } catch (QueryException e) {
             throw new RepositoryException("Could not generate results query", e);
         }
-        
+
+        this.setObjectIndex = queryEngine.getTargets().indexOf("$set");
+        if (setObjectIndex == -1) {
+            throw new RuntimeException("$set not defined");
+        }
+
         this.setSpecIndex = queryEngine.getTargets().indexOf("$setSpec");
-        if (setSpecIndex == -1) { throw new RuntimeException ("$setSpec not defined");}
-        
+        if (setSpecIndex == -1) {
+            throw new RuntimeException("$setSpec not defined");
+        }
+
         this.setNameIndex = queryEngine.getTargets().indexOf("$setName");
-        if (setNameIndex == -1) {throw new RuntimeException("$setName not defined");}
-        
-        this.setDissIndex = queryEngine.getTargets().indexOf("$setDiss");
-        if (setDissIndex == -1) {throw new RuntimeException("$setDiss not defined");}
-        
+        if (setNameIndex == -1) {
+            throw new RuntimeException("$setName not defined");
+        }
+
+        if (disseminationTarget != null) {
+            this.dissTargetIndex =
+                    queryEngine.getTargets().indexOf(disseminationTarget);
+        } else {
+            dissTargetIndex = -1;
+        }
+
+        m_setInfoSpec = setInfoSpec;
     }
+
     public void close() throws RepositoryException {
         try {
             results.close();
@@ -53,29 +83,47 @@ public class MPTSetInfoIterator implements RemoteIterator {
         return results.hasNext();
     }
 
-    public Object next() throws RepositoryException {
+    public SetInfo next() throws RepositoryException {
         try {
             if (results.hasNext()) {
-                List result = results.next();
+                List<Node> result = results.next();
+
+                Node setObjectResult = result.get(setObjectIndex);
+                PID setObject = PID.getInstance(setObjectResult.getValue());
+
                 String setSpec = null;
-                Node setSpecResult = ((Node) result.get(setSpecIndex));
+                Node setSpecResult = result.get(setSpecIndex);
                 if (setSpecResult != null) {
                     setSpec = setSpecResult.getValue();
                 }
-               
+
                 String setName = null;
                 Node setNameResult = ((Node) result.get(setNameIndex));
-               
+
                 if (setNameResult != null) {
                     setName = setNameResult.getValue();
                 }
-                
+
                 String setDiss = null;
-                Node setDissResult = ((Node) result.get(setDissIndex));
-                if (setDissResult != null) {
-                    setDiss = setDissResult.getValue();
+                String setDissType = null;
+
+                if (dissTargetIndex != -1) {
+                    Node dissTargetResult = result.get(dissTargetIndex);
+                    if (dissTargetResult != null) {
+                        setDiss = dissTargetResult.getValue();
+                    }
                 }
-                return new FedoraSetInfo(client, setSpec, setName, setDiss);
+
+                if (m_setInfoSpec != null) {
+                    setDissType = m_setInfoSpec.getDisseminationType();
+                }
+
+                return new FedoraSetInfo(client,
+                                         setObject.toString(),
+                                         setSpec,
+                                         setName,
+                                         setDissType,
+                                         setDiss);
             } else {
                 throw new RepositoryException("No more results available\n");
             }

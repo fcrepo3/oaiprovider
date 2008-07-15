@@ -1,10 +1,10 @@
+
 package fedora.services.oaiprovider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jrdf.graph.Literal;
 import org.jrdf.graph.Node;
 import org.jrdf.graph.URIReference;
@@ -16,15 +16,14 @@ import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 import fedora.client.FedoraClient;
 
-public class FedoraSetInfoIterator implements RemoteIterator {
-
-    private static final Logger logger =
-            Logger.getLogger(FedoraOAIDriver.class.getName());
+public class FedoraSetInfoIterator
+        implements RemoteIterator<SetInfo> {
 
     private FedoraClient m_fedora;
+
     private TupleIterator m_tuples;
 
-    private List m_nextGroup;
+    private List<String[]> m_nextGroup;
 
     private SetInfo m_next;
 
@@ -35,9 +34,8 @@ public class FedoraSetInfoIterator implements RemoteIterator {
     }
 
     /**
-     * Initialize with tuples.
-     *
-     * The tuples should look like:
+     * Initialize with tuples. The tuples should look like:
+     * 
      * <pre>
      * "setSpec"    ,"setName"         ,"setDiss"
      * prime        ,Prime             ,null
@@ -49,33 +47,38 @@ public class FedoraSetInfoIterator implements RemoteIterator {
      * abovetwo     ,Above Two         ,info:fedora/demo:SetAboveTwo/SetInfo.xml
      * </pre>
      */
-    public FedoraSetInfoIterator(FedoraClient fedora,
-                                 TupleIterator tuples) throws RepositoryException {
+    public FedoraSetInfoIterator(FedoraClient fedora, TupleIterator tuples)
+            throws RepositoryException {
         m_fedora = fedora;
         m_tuples = tuples;
-        m_nextGroup = new ArrayList();
+        m_nextGroup = new ArrayList<String[]>();
         m_next = getNext();
     }
 
     private SetInfo getNext() throws RepositoryException {
         try {
-            List group = getNextGroup();
+            List<String[]> group = getNextGroup();
             if (group.size() == 0) return null;
             String[] values = (String[]) group.get(group.size() - 1);
-            return new FedoraSetInfo(m_fedora, values[0], values[1], values[2]);
+            return new FedoraSetInfo(m_fedora,
+                                     values[0],
+                                     values[1],
+                                     values[2],
+                                     values[3],
+                                     values[4]);
         } catch (TrippiException e) {
             throw new RepositoryException("Error getting next tuple", e);
         }
     }
 
     /**
-     * Return the next group of value[]s that have the same value for the first element.
-     * The first element must not be null.
+     * Return the next group of value[]s that have the same value for the first
+     * element. The first element must not be null.
      */
-    private List getNextGroup() throws RepositoryException,
-                                       TrippiException {
-        List group = m_nextGroup;
-        m_nextGroup = new ArrayList();
+    private List<String[]> getNextGroup() throws RepositoryException,
+            TrippiException {
+        List<String[]> group = m_nextGroup;
+        m_nextGroup = new ArrayList<String[]>();
         String commonValue = null;
         if (group.size() > 0) {
             commonValue = ((String[]) group.get(0))[0];
@@ -83,7 +86,8 @@ public class FedoraSetInfoIterator implements RemoteIterator {
         while (m_tuples.hasNext() && m_nextGroup.size() == 0) {
             String[] values = getValues(m_tuples.next());
             String firstValue = values[0];
-            if (firstValue == null) throw new RepositoryException("Not allowed: First value in tuple was null");
+            if (firstValue == null)
+                throw new RepositoryException("Not allowed: First value in tuple was null");
             if (commonValue == null) {
                 commonValue = firstValue;
             }
@@ -96,6 +100,8 @@ public class FedoraSetInfoIterator implements RemoteIterator {
         return group;
     }
 
+    @SuppressWarnings("unchecked")
+    /* trippi is not generic */
     private String[] getValues(Map valueMap) throws RepositoryException {
         try {
             String[] names = m_tuples.names();
@@ -110,21 +116,22 @@ public class FedoraSetInfoIterator implements RemoteIterator {
     }
 
     private String getString(Node node) throws RepositoryException {
-       if (node == null) return null;
-       if (node instanceof Literal) {
-           return ((Literal) node).getLexicalForm();
-       } else if (node instanceof URIReference) {
-           return ((URIReference) node).getURI().toString();
-       } else {
-           throw new RepositoryException("Unhandled node type: " + node.getClass().getName());
-       }
+        if (node == null) return null;
+        if (node instanceof Literal) {
+            return ((Literal) node).getLexicalForm();
+        } else if (node instanceof URIReference) {
+            return ((URIReference) node).getURI().toString();
+        } else {
+            throw new RepositoryException("Unhandled node type: "
+                    + node.getClass().getName());
+        }
     }
 
     public boolean hasNext() throws RepositoryException {
         return (m_next != null);
     }
 
-    public Object next() throws RepositoryException {
+    public SetInfo next() throws RepositoryException {
         try {
             return m_next;
         } finally {

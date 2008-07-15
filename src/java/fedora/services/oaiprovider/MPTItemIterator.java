@@ -1,8 +1,9 @@
+
 package fedora.services.oaiprovider;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -13,66 +14,77 @@ import org.nsdl.mptstore.query.QueryException;
 import org.nsdl.mptstore.query.provider.SQLProvider;
 import org.nsdl.mptstore.rdf.Node;
 
-import fedora.client.FedoraClient;
 import fedora.common.Constants;
+import fedora.common.PID;
 
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 
-
-public class MPTItemIterator implements RemoteIterator, Constants {
+public class MPTItemIterator
+        implements RemoteIterator<FedoraRecord>, Constants {
 
     private static final Logger logger =
-        Logger.getLogger(MPTItemIterator.class.getName());
-    
+            Logger.getLogger(MPTItemIterator.class.getName());
+
     private final MPTResultSetsManager results;
-    private final String mdPrefix;
-    private final FedoraClient client;
-    
+
+    private final FedoraMetadataFormat format;
+
     private final int itemIndex;
+
     private final int itemIDIndex;
-    private final int recordDissIndex;
-    private final int aboutDissIndex;
+
     private final int stateIndex;
+
     private final int dateIndex;
+
     private final int setSpecIndex;
-    private final String recordDiss;
-    private final String aboutDiss;
-    
-    public MPTItemIterator(FedoraClient client, SQLProvider queryEngine, DataSource d, String prefix,
-            String recordDiss, String aboutDiss) {;
-        this.client = client;
-        this.mdPrefix = prefix;
-        this.recordDiss = recordDiss;
-        this.aboutDiss = aboutDiss;
-        
+
+    private final int aboutDissIndex;
+
+    public MPTItemIterator(SQLProvider queryEngine,
+                           DataSource d,
+                           FedoraMetadataFormat format,
+                           String aboutDissTarget) {
+
         try {
             results = new MPTResultSetsManager(d, queryEngine);
         } catch (QueryException e) {
             throw new RepositoryException("Could not generate results query", e);
         }
-        
-        
+
+        this.format = format;
+
         this.itemIDIndex = queryEngine.getTargets().indexOf("$itemID");
-        if (itemIDIndex == -1) { throw new RuntimeException ("$itemID not defined");}
-        
-        this.recordDissIndex = queryEngine.getTargets().indexOf("$recordDiss");
-        if (recordDissIndex == -1) { throw new RuntimeException ("$recordDiss not defined");}
-        
+        if (itemIDIndex == -1) {
+            throw new RuntimeException("$itemID not defined");
+        }
+
         this.stateIndex = queryEngine.getTargets().indexOf("$state");
-        if (stateIndex == -1) { throw new RuntimeException("stateIndex is not defined");}
-        
+        if (stateIndex == -1) {
+            throw new RuntimeException("stateIndex is not defined");
+        }
+
         this.dateIndex = queryEngine.getTargets().indexOf("$date");
-        if (dateIndex == -1) {throw new RuntimeException("dateIndex is not defined");}
-        
-        this.aboutDissIndex = queryEngine.getTargets().indexOf("$aboutDiss");
-        this.setSpecIndex = queryEngine.getTargets().indexOf("$setSpec");
-        
+        if (dateIndex == -1) {
+            throw new RuntimeException("dateIndex is not defined");
+        }
+
         this.itemIndex = queryEngine.getTargets().indexOf("$item");
-        if (itemIndex == -1) {throw new RuntimeException("itemIndex is not defined");}
-        
+        if (itemIndex == -1) {
+            throw new RuntimeException("itemIndex is not defined");
+        }
+
+        this.setSpecIndex = queryEngine.getTargets().indexOf("$setSpec");
+
+        if (aboutDissTarget != null) {
+            this.aboutDissIndex =
+                    queryEngine.getTargets().indexOf(aboutDissTarget);
+        } else {
+            aboutDissIndex = -1;
+        }
     }
-    
+
     public void close() throws RepositoryException {
         try {
             results.close();
@@ -85,61 +97,71 @@ public class MPTItemIterator implements RemoteIterator, Constants {
         return (results.hasNext());
     }
 
-    public Object next() throws RepositoryException {
+    public FedoraRecord next() throws RepositoryException {
         try {
             if (results.hasNext()) {
-                List result = results.next();
-                
-                String pid = (((Node) result.get(itemIndex))).getValue()
-                        .replace("info:fedora/", "");
-                String itemID = ((Node) result.get(itemIDIndex)).getValue();
-                
-                String date = formatDate(((Node) result.get(dateIndex)).toString());
-                boolean deleted = !(((Node) result.get(stateIndex))).getValue().equals(MODEL.ACTIVE.uri);
-                
-                String recordDiss = this.recordDiss.replace("*", pid);
-                
-                String aboutDiss = "";
-                if (aboutDissIndex != -1) {
-                    aboutDiss = this.aboutDiss.replace("*", pid);
-                } 
-            
-                /* 
-                 * Build a set of setSpecs.  This assumes that the results are
+                List<Node> result = results.next();
+
+                PID pid = PID.getInstance(result.get(itemIndex).getValue());
+                String itemID = (result.get(itemIDIndex)).getValue();
+
+                String date = formatDate((result.get(dateIndex)).toString());
+                boolean deleted =
+                        !((result.get(stateIndex))).getValue()
+                                .equals(MODEL.ACTIVE.uri);
+
+                InvocationSpec mdSpec = format.getMetadataSpec();
+                InvocationSpec aboutSpec = format.getAboutSpec();
+
+                String recordDiss = "";
+
+                recordDiss = mdSpec.getDisseminationType(pid);
+
+                String aboutDiss = null;
+
+                if (aboutSpec != null && aboutDissIndex != -1) {
+                    if (result.get(aboutDissIndex) != null) {
+                        aboutDiss = aboutSpec.getDisseminationType(pid);
+                    }
+                }
+
+                /*
+                 * Build a set of setSpecs. This assumes that the results are
                  * grouped by itemID
                  */
-                Set setSpecs = new HashSet();
+                Set<String> setSpecs = new HashSet<String>();
                 if (setSpecIndex != -1) {
                     Node setSpecResult = ((Node) result.get(setSpecIndex));
                     if (setSpecResult != null) {
                         setSpecs.add(setSpecResult.getValue());
                     }
                     if (results.peek() != null) {
-                        while (results.peek().get(itemIDIndex).toString().equals(itemID)) {
-                            List nextEntry = results.next();
-                            setSpecResult = (Node) nextEntry.get(setSpecIndex);
-                         
+                        while (results.peek().get(itemIDIndex).getValue()
+                                .equals(itemID)) {
+                            List<Node> nextEntry = results.next();
+                            setSpecResult = nextEntry.get(setSpecIndex);
+
                             if (setSpecResult != null) {
                                 setSpecs.add(setSpecResult.getValue());
                             }
-                            if (results.peek() == null) {break;}
+                            if (results.peek() == null) {
+                                break;
+                            }
                         }
                     }
-                } 
-                
-                /* All this to create an array[] of the correct type */
-                String[] setSpecList = new String[setSpecs.size()];
-                int i = 0;
-                Iterator setSpecMembers = setSpecs.iterator();
-                while (setSpecMembers.hasNext()) {
-                    setSpecList[i] = (String) setSpecMembers.next();
-                    i++;
                 }
-                
-                
 
-                return new FedoraRecord(this.client, itemID, this.mdPrefix, recordDiss, 
-                        date, deleted, (String[]) setSpecList, aboutDiss);
+                String[] specs =
+                        new ArrayList<String>(setSpecs)
+                                .toArray(new String[setSpecs.size()]);
+
+                return new FedoraRecord(itemID,
+                                        format.getPrefix(),
+                                        recordDiss,
+                                        date,
+                                        deleted,
+                                        specs,
+                                        aboutDiss);
             } else {
                 throw new RepositoryException("No more results available\n");
             }
@@ -152,19 +174,23 @@ public class MPTItemIterator implements RemoteIterator, Constants {
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("remove() not supported");
     }
+
     /*
-     * expects date of the form 
+     * expects date of the form
      * "2006-06-14T17:43:22"^^http://www.w3.org/2001/XMLSchema#dateTime
      */
-    private String formatDate(String tripleDate) throws RepositoryException {
-        
+    private static String formatDate(String tripleDate)
+            throws RepositoryException {
+
         if (!tripleDate.contains("http://www.w3.org/2001/XMLSchema#dateTime")) {
-            throw new RepositoryException("Unknown date format, must be of form "+
-                    "'\"YYYY-MM-DDTHH:MM:SS.sss\"^^<http://www.w3.org/2001/XMLSchema#dateTime>" +
-                    " but instead was given " + tripleDate);
+            throw new RepositoryException("Unknown date format, must be of form "
+                    + "'\"YYYY-MM-DDTHH:MM:SS.sss\"^^<http://www.w3.org/2001/XMLSchema#dateTime>"
+                    + " but instead was given " + tripleDate);
         }
-        
-         return tripleDate.replace("\"", "").replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "")
-            .replaceFirst("\\.[0-9]+Z*", "") + "Z";
+
+        return tripleDate.replace("\"", "")
+                .replace("^^<http://www.w3.org/2001/XMLSchema#dateTime>", "")
+                .replaceFirst("\\.[0-9]+Z*", "")
+                + "Z";
     }
 }

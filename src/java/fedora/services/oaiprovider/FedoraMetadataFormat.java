@@ -1,3 +1,4 @@
+
 package fedora.services.oaiprovider;
 
 import proai.MetadataFormat;
@@ -5,23 +6,29 @@ import proai.MetadataFormat;
 /**
  * @author Edwin Shin
  */
-public class FedoraMetadataFormat implements MetadataFormat {
-    private String m_prefix;
-    private String m_namespaceURI;
-    private String m_schemaLocation;
-    private String m_dissType;
-    private String m_about;
+public class FedoraMetadataFormat
+        implements MetadataFormat {
+
+    private final String m_prefix;
+
+    private final String m_namespaceURI;
+
+    private final String m_schemaLocation;
+
+    private final InvocationSpec m_mdSpec;
+
+    private final InvocationSpec m_aboutSpec;
 
     public FedoraMetadataFormat(String prefix,
-                              String namespaceURI,
-                              String schemaLocation, 
-                              String dissType,
-                              String about) {
+                                String namespaceURI,
+                                String schemaLocation,
+                                InvocationSpec mdSpec,
+                                InvocationSpec aboutSpec) {
         m_prefix = prefix;
         m_namespaceURI = namespaceURI;
         m_schemaLocation = schemaLocation;
-        m_dissType = dissType;
-        m_about = about;
+        m_mdSpec = mdSpec;
+        m_aboutSpec = aboutSpec;
     }
 
     public String getPrefix() {
@@ -35,12 +42,12 @@ public class FedoraMetadataFormat implements MetadataFormat {
     public String getSchemaLocation() {
         return m_schemaLocation;
     }
-    
-    public String getDissType() {
-        return m_dissType;
+
+    public InvocationSpec getMetadataSpec() {
+        return m_mdSpec;
     }
-    
-    public String getAbout() {
-        return m_about;
+
+    public InvocationSpec getAboutSpec() {
+        return m_aboutSpec;
     }
 }

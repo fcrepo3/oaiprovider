@@ -1,3 +1,4 @@
+
 package fedora.services.oaiprovider;
 
 import java.io.*;
@@ -7,7 +8,8 @@ import junit.framework.TestCase;
 /**
  * @author cwilper@cs.cornell.edu
  */
-public class TestResultCombiner extends TestCase {
+public class TestResultCombiner
+        extends TestCase {
 
     public static void main(String[] args) {
         junit.textui.TestRunner.run(TestResultCombiner.class);
@@ -20,11 +22,10 @@ public class TestResultCombiner extends TestCase {
         doTest(1, false, false);
     }
 
-    private void doTest(int n, 
-                        boolean includeSets, 
-                        boolean includeAbouts) throws Exception {
+    private void doTest(int n, boolean includeSets, boolean includeAbouts)
+            throws Exception {
 
-        System.out.println("Running TestResultCombiner.doTest(" + n + ", " 
+        System.out.println("Running TestResultCombiner.doTest(" + n + ", "
                 + includeSets + ", " + includeAbouts + ")");
 
         File f1 = new File("src/test/junit/combiner-test" + n + "-input1.csv");
@@ -60,9 +61,8 @@ public class TestResultCombiner extends TestCase {
         // start combining, comparing actual output to expected output
         ResultCombiner combiner = new ResultCombiner(f1, f2, f3, false);
 
-        BufferedReader expectedReader = new BufferedReader(
-                                            new InputStreamReader(
-                                                new FileInputStream(ex)));
+        BufferedReader expectedReader =
+                new BufferedReader(new InputStreamReader(new FileInputStream(ex)));
 
         String expectedLine = expectedReader.readLine();
 
@@ -71,19 +71,22 @@ public class TestResultCombiner extends TestCase {
         int lineNum = 0;
         while (expectedLine != null) {
             lineNum++;
-            String line = combiner.readLine();    
+            String line = combiner.readLine();
             assertNotNull("Too few output lines.  Expected at least " + lineNum,
-                    line);
-            assertEquals("Unexpected content on line " 
-                    + lineNum + ".  Expected the following:\n" + expectedLine 
-                    + "\n...but got the following:\n" + line,
-                    expectedLine, line);
+                          line);
+            assertEquals("Unexpected content on line " + lineNum
+                                 + ".  Expected the following:\n"
+                                 + expectedLine
+                                 + "\n...but got the following:\n" + line,
+                         expectedLine,
+                         line);
             expectedLine = expectedReader.readLine();
         }
 
         // exhausted expected output, now check if there's more actual output
-        assertNull("Expected only " + lineNum + " output lines, but got at least "
-                 + "one more", combiner.readLine());
+        assertNull("Expected only " + lineNum
+                + " output lines, but got at least " + "one more", combiner
+                .readLine());
 
     }
 }

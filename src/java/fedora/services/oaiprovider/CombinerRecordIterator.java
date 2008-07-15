@@ -1,51 +1,51 @@
+
 package fedora.services.oaiprovider;
 
 import org.apache.log4j.Logger;
 
-import proai.Record;
 import proai.driver.RemoteIterator;
 import proai.error.RepositoryException;
 
-import fedora.client.FedoraClient;
 import fedora.common.Constants;
 
 /**
  * @author cwilper@cs.cornell.edu
  */
-public class CombinerRecordIterator implements RemoteIterator, Constants {
+public class CombinerRecordIterator
+        implements RemoteIterator<FedoraRecord>, Constants {
 
     private static final Logger logger =
-        Logger.getLogger(CombinerRecordIterator.class.getName());
+            Logger.getLogger(CombinerRecordIterator.class.getName());
 
-    private FedoraClient m_fedora;
     private String m_mdPrefix;
+
     private String m_dissTypeURI;
+
     private String m_aboutDissTypeURI;
+
     private ResultCombiner m_combiner;
 
     private String m_nextLine;
-    
+
     /**
      * Initialize with combined record query results.
      */
-    public CombinerRecordIterator(FedoraClient fedora, 
-                                  String mdPrefix,
+    public CombinerRecordIterator(String mdPrefix,
                                   String dissTypeURI,
                                   String aboutDissTypeURI,
                                   ResultCombiner combiner) {
-        m_fedora = fedora;
         m_mdPrefix = mdPrefix;
         m_dissTypeURI = dissTypeURI;
         m_aboutDissTypeURI = aboutDissTypeURI;
         m_combiner = combiner;
         m_nextLine = m_combiner.readLine();
     }
-    
+
     public boolean hasNext() {
         return (m_nextLine != null);
     }
 
-    public Object next() throws RepositoryException {
+    public FedoraRecord next() throws RepositoryException {
         try {
             return getRecord(m_nextLine);
         } finally {
@@ -63,25 +63,21 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
     protected void finalize() {
         close();
     }
-    
+
     public void remove() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("CombinerRecordIterator does not support remove().");
     }
 
     /**
-     * Construct a record given a line from the combiner.
-     *
-     * Expected format is:
-     *
+     * Construct a record given a line from the combiner. Expected format is:
      * "item","itemID","date","state","hasAbout"[,"setSpec1"[,"setSpec2"[,...]]]
-     *
      * For example:
-     *
      * info:fedora/nsdl:2051858,oai:nsdl.org:nsdl:10059:nsdl:2051858,2005-09-20T12:50:01,info:fedora/fedora-system:def/model#Active,true,5101,set2
      */
-    private Record getRecord(String line) throws RepositoryException {
+    private FedoraRecord getRecord(String line) throws RepositoryException {
 
-        logger.debug("Constructing record from combined query result line: " + line);
+        logger.debug("Constructing record from combined query result line: "
+                + line);
 
         String[] parts = line.split(",");
 
@@ -98,7 +94,8 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
                 throw new Exception("Expected at least 5 comma-separated values");
             }
 
-            String pid = parts[0].substring(12); // everything after info:fedora/
+            String pid = parts[0].substring(12); // everything after
+            // info:fedora/
 
             itemID = parts[1];
 
@@ -126,12 +123,11 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
         }
 
         // if we got here, all the parameters were parsed correctly
-        return new FedoraRecord(m_fedora, 
-                                itemID, 
+        return new FedoraRecord(itemID,
                                 m_mdPrefix,
-                                recordDissURI, 
+                                recordDissURI,
                                 utcString,
-                                isDeleted, 
+                                isDeleted,
                                 setSpecs,
                                 aboutDissURI);
     }
@@ -144,16 +140,16 @@ public class CombinerRecordIterator implements RemoteIterator, Constants {
             uri.append(dissType.substring(13)); // starts at the first / after *
             return uri.toString();
         } catch (Throwable th) {
-            throw new Exception("Dissemination type string (" + dissType 
+            throw new Exception("Dissemination type string (" + dissType
                     + ") is too short.");
         }
     }
-    
+
     /**
-     * OAI requires second-level precision at most, but Fedora provides 
-     * millisecond precision.
-     * Fedora only uses UTC dates, so ensure UTC dates are indicated with a 
-     * trailing 'Z'.
+     * OAI requires second-level precision at most, but Fedora provides
+     * millisecond precision. Fedora only uses UTC dates, so ensure UTC dates
+     * are indicated with a trailing 'Z'.
+     * 
      * @param datetime
      * @return datetime string such as 2004-01-31T23:11:00Z
      */
