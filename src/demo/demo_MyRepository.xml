@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:MyRepository" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="My Repository"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-21T11:49:38.437Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-21T11:49:38.437Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:38.437Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>My Repository</dc:title>
+          <dc:identifier>demo:MyRepository</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T18:54:44.265Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/demo:MyRepository">
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:OAIRepository"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="Identify.xml" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:38.437Z"
+      ID="Identify.xml.0" LABEL="OAI Identification Response for this repository"
+      MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <Identify>
+          <repositoryName>My Repository</repositoryName>
+          <baseURL>http://example.org/oai</baseURL>
+          <protocolVersion>2.0</protocolVersion>
+          <adminEmail>someone@somwhere.org</adminEmail>
+          <earliestDatestamp>2005-04-01T12:00:00Z</earliestDatestamp>
+          <deletedRecord>persistent</deletedRecord>
+          <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+        </Identify>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:OAIAdvancedItem-Deployment" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Deployment of demo:OAIAdvancedItem-Service"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-21T17:31:03.031Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-21T17:31:03.031Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:35.703Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Deployment of demo:OAIAdvancedItem-Service</dc:title>
+          <dc:creator>Chris Wilper</dc:creator>
+          <dc:description>This is a Service Deployment object that defines
+          the bindings for the operations defined in demo:OAIAdvancedItem-Service.
+          It fulfills the service contract by binding to a source document
+          (an all-inclusive document that encodes the x and y formats and
+          their associated abouts) and a style document (an xslt stylesheet).
+          These, along with the user-supplied format parameter, are passed to
+          the local saxon servlet with a hardcoded parameter for each method
+          indicating whether the "about" is requested or not.</dc:description>
+          <dc:identifier>demo:OAIAdvancedItem-Deployment</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T17:25:07.250Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT1.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+          <rdf:Description rdf:about="info:fedora/demo:OAIAdvancedItem-Deployment">
+            <fedora-model:hasModel rdf:resource="info:fedora/fedora-system:ServiceDeployment-3.0"/>
+            <fedora-model:isDeploymentOf rdf:resource="info:fedora/demo:OAIAdvancedItem-Service"/>
+            <fedora-model:isContractorOf rdf:resource="info:fedora/demo:OAIAdvancedItem"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="METHODMAP" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:35.703Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraSDepMethodMap-1.0"
+      ID="METHODMAP1.0" LABEL="Deployment Method Map" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fmm:MethodMap bDefPID="demo:OAIAdvancedItem-Service" name="MethodMap"
+          xmlns:fmm="http://fedora.comm.nsdlib.org/service/methodmap">
+          <fmm:Method operationLabel="Get the Metadata block in a format"
+            operationName="getMetadata" wsdlMsgName="getMetadataRequest" wsdlMsgOutput="dissemResponse">
+            <fmm:UserInputParm defaultValue="" label="metatadata format"
+              parmName="format" passBy="VALUE" required="true">
+              <fmm:ValidParmValues>
+                <fmm:ValidParm value="x"/>
+                <fmm:ValidParm value="y"/>
+              </fmm:ValidParmValues>
+            </fmm:UserInputParm>
+            <fmm:DatastreamInputParm parmName="x-and-y-and-abouts.xml"
+              passBy="URL_REF" required="true"/>
+            <fmm:DatastreamInputParm parmName="extract.xsl" passBy="URL_REF" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/xml"/>
+          </fmm:Method>
+          <fmm:Method operationLabel="get the about block for a metadata format"
+            operationName="getMetadataAbout"
+            wsdlMsgName="getMetadataAboutRequest" wsdlMsgOutput="dissemResponse">
+            <fmm:UserInputParm defaultValue="" label="metatadata format"
+              parmName="format" passBy="VALUE" required="true">
+              <fmm:ValidParmValues>
+                <fmm:ValidParm value="x"/>
+                <fmm:ValidParm value="y"/>
+              </fmm:ValidParmValues>
+            </fmm:UserInputParm>
+            <fmm:DatastreamInputParm parmName="x-and-y-and-abouts.xml"
+              passBy="URL_REF" required="true"/>
+            <fmm:DatastreamInputParm parmName="extract.xsl" passBy="URL_REF" required="true"/>
+            <fmm:MethodReturnType wsdlMsgName="dissemResponse" wsdlMsgTOMIME="text/xml"/>
+          </fmm:Method>
+        </fmm:MethodMap>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="DSINPUTSPEC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:35.703Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraDSInputSpec-1.0"
+      ID="DSINPUTSPEC1.0" LABEL="Datastream Input Specification" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <fbs:DSInputSpec bDefPID="demo:XYFormatsBDef"
+          label="Datastream Input Specification" xmlns:fbs="http://fedora.comm.nsdlib.org/service/bindspec">
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="x-and-y-and-abouts.xml">
+            <fbs:DSInputLabel>Source XML</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction/>
+          </fbs:DSInput>
+          <fbs:DSInput DSMax="1" DSMin="1" DSOrdinality="false" wsdlMsgPartName="extract.xsl">
+            <fbs:DSInputLabel>XSL Stylesheet</fbs:DSInputLabel>
+            <fbs:DSMIME>text/xml</fbs:DSMIME>
+            <fbs:DSInputInstruction/>
+          </fbs:DSInput>
+        </fbs:DSInputSpec>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="WSDL" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:35.703Z"
+      FORMAT_URI="http://schemas.xmlsoap.org/wsdl/" ID="WSDL1.0"
+      LABEL="WSDL Bindings" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <wsdl:definitions name="Operations on NSDL metadata objects"
+          targetNamespace="bmech"
+          xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+          xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+          xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap"
+          xmlns:soapenc="http://schemas.xmlsoap.org/wsdl/soap/encoding"
+          xmlns:this="bmech" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <wsdl:types>
+            <xsd:schema targetNamespace="bmech">
+              <xsd:simpleType name="formatType">
+                <xsd:restriction base="xsd:string">
+                  <xsd:enumeration value="x"/>
+                  <xsd:enumeration value="y"/>
+                </xsd:restriction>
+              </xsd:simpleType>
+              <xsd:simpleType name="sourceType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+              <xsd:simpleType name="styleType">
+                <xsd:restriction base="xsd:string"/>
+              </xsd:simpleType>
+            </xsd:schema>
+          </wsdl:types>
+          <wsdl:message name="getMetadataRequest">
+            <wsdl:part name="x-and-y-and-abouts.xml" type="this:sourceType"/>
+            <wsdl:part name="extract.xsl" type="this:styleType"/>
+            <wsdl:part name="format" type="this:formatType"/>
+          </wsdl:message>
+          <wsdl:message name="getMetadataAboutRequest">
+            <wsdl:part name="x-and-y-and-abouts.xml" type="this:sourceType"/>
+            <wsdl:part name="extract.xsl" type="this:styleType"/>
+            <wsdl:part name="format" type="this:formatType"/>
+          </wsdl:message>
+          <wsdl:message name="dissemResponse">
+            <wsdl:part name="dissem" type="xsd:base64Binary"/>
+          </wsdl:message>
+          <wsdl:portType name="metadataOperationsPortType">
+            <wsdl:operation name="getMetadata">
+              <wsdl:input message="this:getMetadataRequest"/>
+              <wsdl:output message="this:dissemResponse"/>
+            </wsdl:operation>
+            <wsdl:operation name="getMetadataAbout">
+              <wsdl:input message="this:getMetadataAboutRequest"/>
+              <wsdl:output message="this:dissemResponse"/>
+            </wsdl:operation>
+          </wsdl:portType>
+          <wsdl:service name="metadataOperations">
+            <wsdl:port binding="this:metadataOperations_http" name="metadataOperations_port">
+              <http:address location="http://local.fedora.server/"/>
+            </wsdl:port>
+          </wsdl:service>
+          <wsdl:binding name="metadataOperations_http" type="this:metadataOperationsPortType">
+            <http:binding verb="GET"/>
+            <wsdl:operation name="getMetadata">
+              <http:operation location="saxon/SaxonServlet?source=(x-and-y-and-abouts.xml)&amp;style=(extract.xsl)&amp;format=(format)&amp;about=false&amp;clear-stylesheet-cache=true"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="text/xml"/>
+              </wsdl:output>
+            </wsdl:operation>
+            <wsdl:operation name="getMetadataAbout">
+              <http:operation location="saxon/SaxonServlet?source=(x-and-y-and-abouts.xml)&amp;style=(extract.xsl)&amp;format=(format)&amp;about=true&amp;clear-stylesheet-cache=true"/>
+              <wsdl:input>
+                <http:urlReplacement/>
+              </wsdl:input>
+              <wsdl:output>
+                <mime:content type="text/xml"/>
+              </wsdl:output>
+            </wsdl:operation>
+          </wsdl:binding>
+        </wsdl:definitions>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

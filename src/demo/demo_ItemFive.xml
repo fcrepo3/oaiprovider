@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:ItemFive" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Item Five (Advanced)"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2008-07-21T11:49:36.203Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-21T11:49:36.203Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:36.203Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Item Five (Advanced)</dc:title>
+          <dc:identifier>demo:ItemFive</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:36.203Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:rel="info:fedora/fedora-system:def/relations-external#"
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+          <rdf:Description rdf:about="info:fedora/demo:ItemFive">
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:OAIAdvancedItem"/>
+            <oai:itemID>oai:example.org:item5</oai:itemID>
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SetPrime"/>
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SetAboveTwoOdd"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="x-and-y-and-abouts.xml" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:36.203Z"
+      ID="x-and-y-and-abouts.xml.1"
+      LABEL="Datastream that includes the x and y metadata (and abouts)" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <all-data>
+          <data format="x">
+            <metadata>
+              <x:xMetadata xmlns:x="http://example.org/formatX/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/formatX/ http://example.org/formatX.xsd">
+                <x:name>Item Five</x:name>
+                <x:date>September, 2005</x:date>
+              </x:xMetadata>
+            </metadata>
+            <abouts>
+              <about>
+                <my_about xmlns="http://example.org/my-about/"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/my-about/ http://example.org/my-about.xsd">
+                  <category>item</category>
+                  <firstCreated>2005-09-20T12:47:10.511</firstCreated>
+                  <primaryIdentifier>http://example.org/item5.html</primaryIdentifier>
+                </my_about>
+              </about>
+              <about>
+                <provenance schemaVersion="1.01.000"
+                  xmlns="http://ns.nsdl.org/provenance_about_v1.01"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ns.nsdl.org/provenance_about_v1.01 http://ns.nsdl.org/schemas/provenance_about/provenance_about_v1.01.xsd">
+                  <originDescription altered="true" harvestDate="2005-07-07T07:57:48Z">
+                    <harvestType>OAI2.0</harvestType>
+                    <dataSource public="true">http://example.org/oai</dataSource>
+                    <identifier>oai:example.org:item5</identifier>
+                    <datestamp>2004-03-02</datestamp>
+                    <metadataNamespace>http://example.org/formatX/</metadataNamespace>
+                  </originDescription>
+                </provenance>
+              </about>
+            </abouts>
+          </data>
+          <data format="y">
+            <metadata>
+              <y:yMetadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xmlns:y="http://example.org/formatY/" xsi:schemaLocation="http://example.org/formatY/ http://example.org/formatY.xsd">
+                <y:label>Item Number Five</y:label>
+                <y:date>2005</y:date>
+              </y:yMetadata>
+            </metadata>
+            <abouts>
+              <about>
+                <my_about xmlns="http://example.org/my-about/"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/my-about/ http://example.org/my-about.xsd">
+                  <category>item</category>
+                  <firstCreated>2005-09-20T12:47:10.511</firstCreated>
+                  <primaryIdentifier>http://example.org/item5.html</primaryIdentifier>
+                </my_about>
+              </about>
+              <about>
+                <provenance schemaVersion="1.01.000"
+                  xmlns="http://ns.nsdl.org/provenance_about_v1.01"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ns.nsdl.org/provenance_about_v1.01 http://ns.nsdl.org/schemas/provenance_about/provenance_about_v1.01.xsd">
+                  <originDescription altered="true" harvestDate="2005-07-07T07:57:48Z">
+                    <harvestType>OAI2.0</harvestType>
+                    <dataSource public="true">http://example.org/oai</dataSource>
+                    <identifier>oai:example.org:item5</identifier>
+                    <datestamp>2004-03-02</datestamp>
+                    <metadataNamespace>http://example.org/formatY/</metadataNamespace>
+                  </originDescription>
+                </provenance>
+              </about>
+            </abouts>
+          </data>
+        </all-data>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="extract.xsl" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2008-07-21T11:49:36.203Z"
+      ID="extract.xsl.12"
+      LABEL="Stylesheet to extract metadata (or abouts) of interest" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+          <xsl:param name="format"/>
+          <xsl:param name="about"/>
+          <xsl:output media-type="text/xml" method="xml"/>
+          <xsl:template match="/all-data">
+            <xsl:for-each select="/all-data/data[@format=$format]">
+              <xsl:choose>
+                <xsl:when test="$about='true'">
+                  <xsl:apply-templates select="abouts"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="metadata/node()"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:template>
+          <xsl:template match="@*|node()">
+            <xsl:copy>
+              <xsl:apply-templates select="@*|node()"/>
+            </xsl:copy>
+          </xsl:template>
+        </xsl:stylesheet>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>

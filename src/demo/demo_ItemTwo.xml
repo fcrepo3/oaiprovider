@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject PID="demo:ItemTwo" VERSION="1.1"
+  xmlns:foxml="info:fedora/fedora-system:def/foxml#">
+  <foxml:objectProperties>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="Item Two (Simple)"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2002-02-02T00:00:00.000Z"/>
+    <foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2008-07-21T11:49:38.031Z"/>
+  </foxml:objectProperties>
+  <foxml:datastream CONTROL_GROUP="X" ID="DC" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2002-02-02T00:00:00.000Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="DC1.0"
+      LABEL="Dublin Core Record for this object" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/">
+          <dc:title>Item Two (Simple)</dc:title>
+          <dc:identifier>demo:ItemTwo</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="RELS-EXT" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2002-02-02T00:00:00.000Z"
+      FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" ID="RELS-EXT.0"
+      LABEL="RDF Statements about this object" MIMETYPE="application/rdf+xml">
+      <foxml:xmlContent>
+        <rdf:RDF xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          xmlns:rel="info:fedora/fedora-system:def/relations-external#"
+          xmlns:fedora-model="info:fedora/fedora-system:def/model#">
+          <rdf:Description rdf:about="info:fedora/demo:ItemTwo">
+            <fedora-model:hasModel rdf:resource="info:fedora/demo:OAISimpleItem"/>
+            <oai:itemID>oai:example.org:item2</oai:itemID>
+            <rel:isMemberOf rdf:resource="info:fedora/demo:SetPrime"/>
+          </rdf:Description>
+        </rdf:RDF>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="oai_dc" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2002-02-02T00:00:00.000Z"
+      FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" ID="oai_dc.0"
+      LABEL="oai_dc" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/                                 http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+          <dc:identifier>urn:example:resource2</dc:identifier>
+        </oai_dc:dc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+  <foxml:datastream CONTROL_GROUP="X" ID="test_format" STATE="A" VERSIONABLE="true">
+    <foxml:datastreamVersion CREATED="2002-02-02T00:00:00.000Z"
+      ID="test_format.0" LABEL="test_format" MIMETYPE="text/xml">
+      <foxml:xmlContent>
+        <test_format:doc xmlns:test_format="http://example.org/test_format/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.org/test_format/                                      http://example.org/test_format.xsd">
+          <test_format:resource>urn:example:resource2</test_format:resource>
+        </test_format:doc>
+      </foxml:xmlContent>
+    </foxml:datastreamVersion>
+  </foxml:datastream>
+</foxml:digitalObject>
