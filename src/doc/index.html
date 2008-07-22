@@ -8,10 +8,11 @@
 <body>
 
 <div id="header"> 
-  <a href="http://www.fedora.info/download/2.2/userdocs/index.html" id="logo"></a>
+  <!-- <a href="http://www.fedora.info/download/2.2/userdocs/index.html" id="logo"></a>  -->
+  <img id="logo" src="../images/logo_44x60.gif" />
   <div id="title">
     <h1>Fedora OAI Provider Service</h1>
-    <h2>For Fedora Version 2.2</h2>
+    <h2>Version 1.2</h2>
   </div>
 </div>
 
@@ -34,46 +35,46 @@
   <p>
     The Fedora OAI Provider Service is part of the 
     Fedora Service Framework and offers a vast improvement over the
-    previous, simple OAI provider that Fedora used in previous versions.
-    The new provider is based on <a href="http://proai.sourceforge.net/">Proai</a>, 
+    previous, simple OAI provider that the Fedora Repository used in previous versions.
+    The new provider is based on <a href="http://proai.sourceforge.net/">PROAI</a>, 
     an open source caching, polling OAI provider. It has the following
     features: 
   </p>
   <ul>
     <li> 
       Supports any metadata format available through your Fedora
-      repository via a datastream or dissemination.
+      Repository via a datastream or dissemination service
     </li>
     <li> 
       Supports sets that are expressed as RDF relationships in
       your digital objects' RELS-EXT datastreams as exposed via the 
-      Resource Index.
+      Resource Index
     </li>
     <li> 
-      Runs as a webapp in any servlet container, acting as a web service
-      client to Fedora.
+      Runs as a Web application in any servlet container, acting as a Web service
+      client to the Fedora Repository
     </li>
     <li> 
-      Caches the content of the Fedora disseminations and
-      datastreams intended to be exposed as OAI records. This allows for fast
-      response times and ensures that the OAI provider can continue to
-      run <i>even when Fedora is temporarily stopped</i>.
+      Caches the content of Fedora Repository disseminations and
+      datastreams intended to be exposed as OAI records allowing for fast
+      response times and ensuring that the OAI provider can continue to
+      run <i>even when the Fedora Repository is temporarily stopped</i>
     </li>
   </ul>
-  <p><b>NEW FEATURES:</b>
-    This release of the OAI Provider incorportates the following new features:
+  <p><b>NEW FEATURES</b><br /><br />
+    This release of the OAI Provider incorporates the following new features:
     <ul>
-      <li> <i>Automatic schema validation.</i><br/>
+      <li> <b>Automatic schema validation</b><br />
            Incoming record XML can now be automatically validated and
            rejected if it doesn't conform to the XML schema it declares.</li>
-      <li> <i>Support for MPTStore</i><br/>
+      <li> <b>Support for MPTStore</b><br />
            As of release 2.2, Fedora now supports an alternate triplestore,
            <a href="http://mptstore.sourceforge.net">MPTStore</a>, for
            the <a href="http://www.fedora.info/download/2.2/userdocs/server/resourceIndex/index.html">Resource Index</a>.  The OAI Provider service has been modified
            to support this configuration option.  It can now be used whether
-           the RI is backed by Kowari or MPTStore.
+           the RI is backed by Mulgara, Kowari, or MPTStore.
     </ul>
-    See the <a href="configuration.html">Configuration Reference</a> for
+    See the <a href="#configuration">Configuration</a> section for
     more detail on using these new capabilities.
   </p>
 </div>
@@ -90,21 +91,21 @@
       create tables in the database.
     </li>
     <li> 
-      Make sure your Fedora repository is running with the
-      Resource Index turned ON. This is necessary because the 
-      oai provider periodically queries the resource index to 
+      Make sure your Fedora Repository is running with the
+      Resource Index turned <b>ON</b>. This is necessary because the 
+      OAI provider periodically queries the resource index to 
       discover which records of interest have changed.
     </li>
     <li> 
-      Deploy the oaiprovider.war file into your servlet
+      Deploy the <code>oaiprovider.war</code> file into your servlet
       container.
     </li>
     <li> 
-      Configure the OAI provider as described in the
-      Configuration section below.
+      Configure the OAI Provider as described in the
+      <a href="#configuration">Configuration</a> section below.
     </li>
     <li>
-      Re-start the webapp (this is often done by restarting 
+      Re-start the Web application (this is often done by restarting 
       the servlet container itself).
     </li>
   </ol>
@@ -115,17 +116,17 @@
 <div class="sec2">
   <h2><a name="demo">3. Demonstration / Test Setup</a></h2>
   <p>
-    The source distribution of the OAI Provider Service includes several test
-    Fedora objects. You can use these objects and the default
-    proai.properties configuration file to quickly get an idea
-    for how the service works.
+    The source distribution of the OAI Provider service includes several test
+    Fedora digital objects. You can use these objects and the default
+    <code>proai.properties</code> configuration file to quickly understand how 
+    the service works.
   </p>
   <ol>
     <li>
-      Complete installation steps 1-4 above, using most
-      of the default values in the <code>proai.properties</code> configuration file, but
-      making sure that the following properties are set according to your own
-      Fedora installation:
+      Complete installation steps 1-4 above.  Start with the
+      default values in the <code>proai.properties</code> configuration file and
+      ensure the following properties are set according to your own
+      Fedora Repository installation:
       <ul>
         <li>driver.fedora.baseURL</li>
         <li>driver.fedora.user</li>
@@ -133,42 +134,42 @@
       </ul>
     </li>
     <li>
-      Make sure your Fedora installation is configured to retain
+      Make sure your Fedora Repository installation is configured to retain
       (rather than re-generate) PIDs of objects in the "demo" PID namespace
-      on ingest. You can check this in your fedora.fcfg file:
+      on ingest. You can check this in your <code>fedora.fcfg</code> file:
       If one of the values of "retainPIDs" is "demo" or
-      "*" (asterisk), Fedora is configured correctly. Otherwise,
-      you should add this value and re-start Fedora.
+      "*" (asterisk), your repository is configured correctly. Otherwise,
+      you should add this value and re-start it.
     </li>
     <li>
-      Use the fedora-admin GUI or fedora-ingest command-line
-      utility to ingest all foxml objects in the src/test/foxml
-      directory of the Fedora OAI Provider source distribution.
+      Use the <code>fedora-admin</code> GUI or <code>fedora-ingest</code> command-line
+      utility to ingest all demonstration objects in the <code>src/test/foxml</code>
+      directory of the Fedora OAI Provider service source distribution.
     </li>
     <li>
-      Start the webapp.
+      Start the Web application.
     </li>
   </ol>
   <p>
-    Upon starting, the service will poll Fedora for objects that
-    provide oai record content and have changed since its last update.
-    It will find the objects you just ingested, request
+    Upon starting, the Fedora OAI Provider service will poll the repository for objects that
+    provide OAI record content and have changed since its last update.
+    It will find the demonstration objects you just ingested, request
     appropriate disseminations of each, and save them in its cache.
     Once it has successfully completed a cache update cycle, you
-    should be able to hit the front-end (where you installed the service)
-    with OAI-PMH verbs. Here are a couple examples:
+    should be able call the <code>oaiprovider</code> client service interface with OAI-PMH verbs. 
+    Here are some examples (note that you may have to substitute the name of your host for <code>localhost</code>):
   </p>
   <div class="code"><pre>http://localhost/oaiprovider/?verb=Identify<br/>http://localhost/oaiprovider/?verb=ListRecords&amp;metadataPrefix=oai_dc</pre></div>
   <p>
-    Now try using fedora-admin to edit one of the datastreams of one
-    of the demo objects you just ingested. The next time the
-    oaiprovider service polls Fedora for modified records,
-    it should pick up this change and make it available via the front-end.
+    Now try using <code>fedora-admin</code> to edit a datastream in one
+    of the demonstration objects you just ingested. The next time the
+    OAI Provider service polls the repository for modified objects,
+    it should pick up this change and make it available via the <code>oaiprovider</code> client service interface.
   </p>
   <p>
     Note that the poll frequency is ten minutes by default -- this can 
     be configured to be more or less frequent by changing the 
-    <code>proai.driverPollSeconds</code> in the <code>proai.properties</code> 
+    <code>proai.driverPollSeconds</code> property in the <code>proai.properties</code> 
     file.
   </p>
 </div>
@@ -178,37 +179,27 @@
 <div class="sec2">
   <h2><a name="configuration">4. Configuration</a></h2>
   <p>
-    Please consult the <a href="configuration.html">OAI Provider 
-    Configuration Reference</a> for a complete list of <code>proai.properties</code>
+    Please consult the PROAI documentation for a complete list of <code>proai.properties</code>
     configuration options and what they do.
   </p>
   <p>
     You should also take a look at the <code>log4j.xml</code> that
     resides alongside the <code>proai.properties</code> file in
-    the webapp's <code>WEB-INF/classes</code> directory.  This file
+    the Web application's <code>WEB-INF/classes</code> directory.  This file
     controls where log messages will be sent and how much detail they
-    will contain.  When first setting up the OAI provider,
+    will contain.  When first setting up the Fedora OAI Provider service,
     it is recommended that you keep the log level high (DEBUG for
     most categories).
   </p>
 </div>
 
-<div id="footer">
-<div id="copyright">Copyright &copy; 2006-2007 Fedora
-Project </div>
+    <div id="footer">
+    
+      <div id="copyright">
+        Copyright &copy; 2006-2007 Fedora Project, 2008 Fedora Commons, Inc.
+      </div>
+    
+    </div>
 
-<div id="lastModified"> Last Modified
-<script type="text/javascript">
-//<![CDATA[
-var cvsDate = "$Date$";
-var parts = cvsDate.split(" ");
-var modifiedDate = parts[1];
-document.write(modifiedDate);
-//]]>
-</script>
-</div>
-
-</div>
-
-</body>
+  </body>
 </html>
