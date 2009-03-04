@@ -181,10 +181,10 @@ public class ITQLQueryFactory implements QueryFactory, Constants {
 
         // date constraints are optional
         if (afterUTC != null) {
-            out.append("and    $date           <" + TUCANA.AFTER + "> '" + afterUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
+            out.append("and    $date           <http://mulgara.org/mulgara#after> '" + afterUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
         }
         if (beforeUTC != null) {
-            out.append("and    $date           <" + TUCANA.BEFORE + "> '" + beforeUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
+            out.append("and    $date           <http://mulgara.org/mulgara#before> '" + beforeUTC + "'^^<" + XSD.DATE_TIME + "> in <#xsd>\n");
         }
     }
 
