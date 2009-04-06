@@ -108,6 +108,9 @@ public class FedoraSetInfoIterator
             String[] values = new String[names.length];
             for (int i = 0; i < names.length; i++) {
                 values[i] = getString((Node) valueMap.get(names[i]));
+                if (names[i].equals("setSpec")) {
+                    values[i] = values[i].replace(' ', '_');
+                }
             }
             return values;
         } catch (Exception e) {

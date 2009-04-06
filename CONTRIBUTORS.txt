@@ -1,0 +1,2 @@
+Oliver Lucido and Harry Sidhunata
+- FCREPO-471: Replace whitespace in setSpecs with underscores

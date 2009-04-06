@@ -40,7 +40,7 @@ public class FedoraSetInfo
                          String setDissInfo) {
         m_fedora = fedora;
         m_setPID = PID.getInstance(setObjectPID);
-        m_setSpec = setSpec;
+        m_setSpec = setSpec.replace(' ', '_');
         m_setName = setName;
         if (setDissInfo != null) {
             m_setDiss = InvocationSpec.getInstance(setDiss);

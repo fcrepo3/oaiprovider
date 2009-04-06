@@ -38,7 +38,8 @@ public class FedoraRecord
         buf.append(" " + deleted);
         buf.append(" " + date);
         for (int i = 0; i < setSpecs.length; i++) {
-            buf.append(" " + setSpecs[i]);
+            String setSpec = setSpecs[i].replace(' ', '_');
+            buf.append(" " + setSpec);
         }
         m_sourceInfo = buf.toString();
     }
