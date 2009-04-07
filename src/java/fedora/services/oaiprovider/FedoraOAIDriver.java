@@ -230,7 +230,7 @@ public class FedoraOAIDriver
             setSpecs.add(parts[i]);
         }
 
-        out.println("<record xmlns=\"http://www.openarchives.org/OAI/2.0/\">");
+        out.println("<record>");
         writeRecordHeader(itemID, deleted, date, setSpecs, out);
         if (!deleted) {
             writeRecordMetadata(dissURI, out);
