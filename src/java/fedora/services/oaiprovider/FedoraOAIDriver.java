@@ -27,8 +27,9 @@ public class FedoraOAIDriver
             "xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ "
                     + "http://www.openarchives.org/OAI/2.0/oai_dc.xsd\"";
 
-    private static final String _XSI_DECLARATION =
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
+    private static final String _XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
+
+    private static final String _XSI_DECLARATION = "xmlns:xsi=\"" + _XSI_URI + "\"";
 
     private static final Logger logger =
             Logger.getLogger(FedoraOAIDriver.class.getName());
@@ -282,11 +283,11 @@ public class FedoraOAIDriver
                     buf.toString().replaceAll("\\s*<\\?xml.*?\\?>\\s*", "");
             if ((dissURI.split("/").length == 3) && (dissURI.endsWith("/DC"))) {
                 // If it's a DC datastream dissemination, inject the
-                // xsi:schemaLocation attribute
-                xml =
-                        xml.replaceAll("<oai_dc:dc ", "<oai_dc:dc "
-                                + _XSI_DECLARATION + " " + _DC_SCHEMALOCATION
-                                + " ");
+                // xsi:schemaLocation attribute if needed
+                if (xml.indexOf(_XSI_URI) == -1) {
+                    xml = xml.replaceAll("<oai_dc:dc ", "<oai_dc:dc "
+                            + _XSI_DECLARATION + " " + _DC_SCHEMALOCATION + " ");
+                }
             }
             out.println("  <metadata>");
             out.print(xml);
