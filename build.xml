@@ -3,7 +3,7 @@
 
   <loadproperties srcFile="build.properties"/>
 
-  <property name="oaiprovider.version" value="1.2"/>
+  <property name="oaiprovider.version" value="1.2.1"/>
 
   <path id="base.path">
     <pathelement location="${lib.jrdf}"/>
