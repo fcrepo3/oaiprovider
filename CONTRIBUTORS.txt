@@ -2,3 +2,5 @@ Oliver Lucido and Harry Sidhunata
 - FCREPO-471: Replace whitespace in setSpecs with underscores
 Simon Lamb
 - FCREPO-474: Remove extraneous namespace declaration on record elements
+Mollerup (shm at dbc.dk)
+- FCREPO-631: namespace declaration in DC datastream added even if present
